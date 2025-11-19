@@ -1,0 +1,27 @@
+### **Emergency Event and Crisis Management Public Opinion Report Template**
+
+- **1.0 Report Summary**
+  - 1.1 Event Characterization
+  - 1.2 Core Conclusions
+  - 1.3 Key Recommendations
+- **2.0 Event Tracing and Development Context**
+  - 2.1 Event Background and First Report
+  - 2.2 Key Development Timeline
+  - 2.3 Current Situation
+- **3.0 Public Opinion Dissemination Analysis**
+  - 3.1 Dissemination Voice Trends
+  - 3.2 Core Dissemination Channels
+  - 3.3 Key Dissemination Nodes (KOL/Media)
+- **4.0 Public Opinion Core Focus and Public Attitudes**
+  - 4.1 Public Opinion Focus Analysis
+  - 4.2 Netizen Sentiment Distribution
+  - 4.3 Major Viewpoint Excerpts
+- **5.0 Risk Assessment**
+  - 5.1 Short-term Risks
+  - 5.2 Long-term Risks
+  - 5.3 Secondary/Derivative Risks
+- **6.0 Response Strategy and Handling Recommendations**
+  - 6.1 Golden Response Period Recommendations
+  - 6.2 Messaging and Statement Recommendations
+  - 6.3 Internal and External Communication Strategy
+  - 6.4 Follow-up Action Plan
