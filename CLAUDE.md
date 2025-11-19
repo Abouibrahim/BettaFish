@@ -32,6 +32,37 @@ playwright install chromium
 2. All configuration is managed via `.env` file using Pydantic Settings
 3. The `config.py` module loads settings from `.env` or environment variables
 
+#### API Configuration for English Content
+
+**See [API_SETUP_GUIDE.md](API_SETUP_GUIDE.md) for detailed step-by-step instructions on obtaining all API keys.**
+
+**Recommended LLM Providers for English Content:**
+
+| Agent | Recommended Provider | Model | Purpose |
+|-------|---------------------|-------|---------|
+| Insight Agent | OpenAI | gpt-4o | Analytical reasoning and database mining |
+| Media Agent | Google | gemini-2.0-flash-exp | Multimodal content analysis (images/videos) |
+| Query Agent | OpenAI | gpt-3.5-turbo | Cost-effective web search processing |
+| Report Agent | OpenAI | gpt-4o | High-quality report generation |
+| Forum Host | OpenAI | gpt-4o | Agent coordination and debate |
+
+**Cost Estimates:**
+- Budget setup (GPT-3.5 + Gemini free): $10-50/month
+- Balanced setup (GPT-4o + GPT-3.5 + Gemini): $50-200/month
+- Premium setup (GPT-4o everywhere): $200-500/month
+
+**Alternative Providers:**
+- **Anthropic Claude** (Sonnet 3.5): Excellent for analytical reasoning, longer context
+- **OpenAI GPT-4o**: Best all-around performance for English
+- **Google Gemini**: Best for multimodal tasks, generous free tier
+
+**Original Chinese Content Recommendations:**
+- Insight: Kimi k2 (https://platform.moonshot.cn/)
+- Media: Gemini 2.5 Pro
+- Query: DeepSeek Chat (https://platform.deepseek.com/)
+- Report: Gemini 2.5 Pro
+- Forum Host: Qwen Plus (https://www.aliyun.com/product/bailian)
+
 ### Running the Application
 
 **Full System (Recommended):**
@@ -87,27 +118,31 @@ black .
 BettaFish uses a **forum-based collaborative mechanism** where specialized agents work together:
 
 1. **Insight Agent** (`InsightEngine/`) - Private database mining and analysis
-   - Primary LLM: Kimi (kimi-k2-0711-preview recommended)
+   - Primary LLM (English): GPT-4o or Claude Sonnet 3.5
+   - Primary LLM (Chinese): Kimi (kimi-k2-0711-preview)
    - Performs deep analysis on private sentiment databases
    - Uses local sentiment analysis models for accuracy
 
 2. **Media Agent** (`MediaEngine/`) - Multimodal content analysis
-   - Primary LLM: Gemini 2.5 Pro (recommended)
+   - Primary LLM: Gemini 2.0 Flash / Gemini 2.5 Pro (recommended for all languages)
    - Powerful multimodal capabilities for images/videos
-   - Processes content from Douyin, Kuaishou, etc.
+   - Processes content from TikTok, YouTube, Instagram (English) or Douyin, Kuaishou (Chinese)
 
 3. **Query Agent** (`QueryEngine/`) - Web search and news aggregation
-   - Primary LLM: DeepSeek Chat (recommended)
+   - Primary LLM (English): GPT-3.5-turbo (cost-effective)
+   - Primary LLM (Chinese): DeepSeek Chat
    - Searches domestic and international news
    - Integrates with Tavily and Bocha search APIs
 
 4. **Report Agent** (`ReportEngine/`) - Intelligent report generation
-   - Primary LLM: Gemini 2.5 Pro (recommended)
+   - Primary LLM (English): GPT-4o or Claude Sonnet 3.5
+   - Primary LLM (Chinese): Gemini 2.5 Pro
    - Dynamically selects templates from `report_template/`
    - Multi-round generation for high-quality reports
 
 5. **Forum Engine** (`ForumEngine/`) - Agent coordination and debate
-   - Forum host LLM: Qwen Plus (recommended)
+   - Forum host LLM (English): GPT-4o or Claude Sonnet 3.5
+   - Forum host LLM (Chinese): Qwen Plus
    - Monitors agent logs and facilitates debate
    - Generates moderator summaries to guide discussion
 
