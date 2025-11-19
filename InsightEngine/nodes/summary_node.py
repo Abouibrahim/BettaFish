@@ -28,7 +28,7 @@ try:
     FORUM_READER_AVAILABLE = True
 except ImportError:
     FORUM_READER_AVAILABLE = False
-    logger.warning("无法导入forum_reader模块，将跳过HOST发言读取功能")
+    logger.warning("Unable to import forum_reader module, will skip HOST speech reading functionality")
 
 
 class FirstSummaryNode(StateMutationNode):
@@ -39,7 +39,7 @@ class FirstSummaryNode(StateMutationNode):
         初始化首次总结节点
         
         Args:
-            llm_client: LLM客户端
+            llm_client: LLM client
         """
         super().__init__(llm_client, "FirstSummaryNode")
     
@@ -204,7 +204,7 @@ class ReflectionSummaryNode(StateMutationNode):
         初始化反思总结节点
         
         Args:
-            llm_client: LLM客户端
+            llm_client: LLM client
         """
         super().__init__(llm_client, "ReflectionSummaryNode")
     

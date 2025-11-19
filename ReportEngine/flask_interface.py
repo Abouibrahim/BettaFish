@@ -1,6 +1,6 @@
 """
-Report Engine Flask接口
-提供HTTP API用于报告生成
+Report Engine Flask interface
+Provides HTTP API for report generation
 """
 
 import os
@@ -15,29 +15,29 @@ from .agent import ReportAgent, create_agent
 from .utils.config import settings
 
 
-# 创建Blueprint
+# Create Blueprint
 report_bp = Blueprint('report_engine', __name__)
 
-# 全局变量
+# Global variables
 report_agent = None
 current_task = None
 task_lock = threading.Lock()
 
 
 def initialize_report_engine():
-    """初始化Report Engine"""
+    """Initialize Report Engine"""
     global report_agent
     try:
         report_agent = create_agent()
-        logger.info("Report Engine初始化成功")
+        logger.info("Report Engine initialized successfully")
         return True
     except Exception as e:
-        logger.exception(f"Report Engine初始化失败: {str(e)}")
+        logger.exception(f"Report Engine initialization failed: {str(e)}")
         return False
 
 
 class ReportTask:
-    """报告生成任务"""
+    """Report generation task"""
 
     def __init__(self, query: str, task_id: str, custom_template: str = ""):
         self.task_id = task_id
@@ -57,7 +57,7 @@ class ReportTask:
         self.state_file_relative_path = ""
 
     def update_status(self, status: str, progress: int = None, error_message: str = ""):
-        """更新任务状态"""
+        """Update task status"""
         self.status = status
         if progress is not None:
             self.progress = progress
@@ -66,7 +66,7 @@ class ReportTask:
         self.updated_at = datetime.now()
 
     def to_dict(self) -> Dict[str, Any]:
-        """转换为字典格式"""
+        """Convert to dictionary format"""
         return {
             'task_id': self.task_id,
             'query': self.query,
@@ -83,7 +83,7 @@ class ReportTask:
 
 
 def check_engines_ready() -> Dict[str, Any]:
-    """检查三个子引擎是否都有新文件"""
+    """Check if all three sub-engines have new files"""
     directories = {
         'insight': 'insight_engine_streamlit_reports',
         'media': 'media_engine_streamlit_reports',
@@ -95,7 +95,7 @@ def check_engines_ready() -> Dict[str, Any]:
     if not report_agent:
         return {
             'ready': False,
-            'error': 'Report Engine未初始化'
+            'error': 'Report Engine not initialized'
         }
 
     return report_agent.check_input_files(
@@ -107,26 +107,26 @@ def check_engines_ready() -> Dict[str, Any]:
 
 
 def run_report_generation(task: ReportTask, query: str, custom_template: str = ""):
-    """在后台线程中运行报告生成"""
+    """Run report generation in background thread"""
     global current_task
 
     try:
         task.update_status("running", 10)
 
-        # 检查输入文件
+        # Check input files
         check_result = check_engines_ready()
         if not check_result['ready']:
-            task.update_status("error", 0, f"输入文件未准备就绪: {check_result.get('missing_files', [])}")
+            task.update_status("error", 0, f"Input files not ready: {check_result.get('missing_files', [])}")
             return
 
         task.update_status("running", 30)
 
-        # 加载输入文件
+        # Load input files
         content = report_agent.load_input_files(check_result['latest_files'])
 
         task.update_status("running", 50)
 
-        # 生成报告
+        # Generate report
         generation_result = report_agent.generate_report(
             query=query,
             reports=content['reports'],
@@ -139,7 +139,7 @@ def run_report_generation(task: ReportTask, query: str, custom_template: str = "
 
         task.update_status("running", 90)
 
-        # 保存结果
+        # Save result
         task.html_content = html_report
         task.report_file_path = generation_result.get('report_filepath', '')
         task.report_file_relative_path = generation_result.get('report_relative_path', '')
@@ -149,9 +149,9 @@ def run_report_generation(task: ReportTask, query: str, custom_template: str = "
         task.update_status("completed", 100)
 
     except Exception as e:
-        logger.exception(f"报告生成过程中发生错误: {str(e)}")
+        logger.exception(f"Error occurred during report generation: {str(e)}")
         task.update_status("error", 0, str(e))
-        # 只在出错时清理任务
+        # Only clean up task on error
         with task_lock:
             if current_task and current_task.task_id == task.task_id:
                 current_task = None
@@ -159,7 +159,7 @@ def run_report_generation(task: ReportTask, query: str, custom_template: str = "
 
 @report_bp.route('/status', methods=['GET'])
 def get_status():
-    """获取Report Engine状态"""
+    """Get Report Engine status"""
     try:
         engines_status = check_engines_ready()
 
@@ -172,7 +172,7 @@ def get_status():
             'current_task': current_task.to_dict() if current_task else None
         })
     except Exception as e:
-        logger.exception(f"获取Report Engine状态失败: {str(e)}")
+        logger.exception(f"Failed to get Report Engine status: {str(e)}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -181,55 +181,55 @@ def get_status():
 
 @report_bp.route('/generate', methods=['POST'])
 def generate_report():
-    """开始生成报告"""
+    """Start report generation"""
     global current_task
 
     try:
-        # 检查是否有任务在运行
+        # Check if there's a task running
         with task_lock:
             if current_task and current_task.status == "running":
                 return jsonify({
                     'success': False,
-                    'error': '已有报告生成任务在运行中',
+                    'error': 'A report generation task is already running',
                     'current_task': current_task.to_dict()
                 }), 400
 
-            # 如果有已完成的任务，清理它
+            # If there's a completed task, clean it up
             if current_task and current_task.status in ["completed", "error"]:
                 current_task = None
 
-        # 获取请求参数
+        # Get request parameters
         data = request.get_json() or {}
-        query = data.get('query', '智能舆情分析报告')
+        query = data.get('query', 'Intelligent Public Opinion Analysis Report')
         custom_template = data.get('custom_template', '')
 
-        # 清空日志文件
+        # Clear log file
         clear_report_log()
 
-        # 检查Report Engine是否初始化
+        # Check if Report Engine is initialized
         if not report_agent:
             return jsonify({
                 'success': False,
-                'error': 'Report Engine未初始化'
+                'error': 'Report Engine not initialized'
             }), 500
 
-        # 检查输入文件是否准备就绪
+        # Check if input files are ready
         engines_status = check_engines_ready()
         if not engines_status['ready']:
             return jsonify({
                 'success': False,
-                'error': '输入文件未准备就绪',
+                'error': 'Input files not ready',
                 'missing_files': engines_status.get('missing_files', [])
             }), 400
 
-        # 创建新任务
+        # Create new task
         task_id = f"report_{int(time.time())}"
         task = ReportTask(query, task_id, custom_template)
 
         with task_lock:
             current_task = task
 
-        # 在后台线程中运行报告生成
+        # Run report generation in background thread
         thread = threading.Thread(
             target=run_report_generation,
             args=(task, query, custom_template),
@@ -240,12 +240,12 @@ def generate_report():
         return jsonify({
             'success': True,
             'task_id': task_id,
-            'message': '报告生成已启动',
+            'message': 'Report generation started',
             'task': task.to_dict()
         })
 
     except Exception as e:
-        logger.exception(f"开始生成报告失败: {str(e)}")
+        logger.exception(f"Failed to start report generation: {str(e)}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -254,11 +254,11 @@ def generate_report():
 
 @report_bp.route('/progress/<task_id>', methods=['GET'])
 def get_progress(task_id: str):
-    """获取报告生成进度"""
+    """Get report generation progress"""
     try:
         if not current_task or current_task.task_id != task_id:
-            # 如果任务不存在，可能是已经完成并被清理了
-            # 返回一个默认的完成状态而不是404
+            # If task doesn't exist, it may have been completed and cleaned up
+            # Return a default completed status instead of 404
             return jsonify({
                 'success': True,
                 'task': {
@@ -279,7 +279,7 @@ def get_progress(task_id: str):
         })
 
     except Exception as e:
-        logger.exception(f"获取报告生成进度失败: {str(e)}")
+        logger.exception(f"Failed to get report generation progress: {str(e)}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -288,18 +288,18 @@ def get_progress(task_id: str):
 
 @report_bp.route('/result/<task_id>', methods=['GET'])
 def get_result(task_id: str):
-    """获取报告生成结果"""
+    """Get report generation result"""
     try:
         if not current_task or current_task.task_id != task_id:
             return jsonify({
                 'success': False,
-                'error': '任务不存在'
+                'error': 'Task does not exist'
             }), 404
 
         if current_task.status != "completed":
             return jsonify({
                 'success': False,
-                'error': '报告尚未完成',
+                'error': 'Report not yet completed',
                 'task': current_task.to_dict()
             }), 400
 
@@ -309,7 +309,7 @@ def get_result(task_id: str):
         )
 
     except Exception as e:
-        logger.exception(f"获取报告生成结果失败: {str(e)}")
+        logger.exception(f"Failed to get report generation result: {str(e)}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -318,18 +318,18 @@ def get_result(task_id: str):
 
 @report_bp.route('/result/<task_id>/json', methods=['GET'])
 def get_result_json(task_id: str):
-    """获取报告生成结果（JSON格式）"""
+    """Get report generation result (JSON format)"""
     try:
         if not current_task or current_task.task_id != task_id:
             return jsonify({
                 'success': False,
-                'error': '任务不存在'
+                'error': 'Task does not exist'
             }), 404
 
         if current_task.status != "completed":
             return jsonify({
                 'success': False,
-                'error': '报告尚未完成',
+                'error': 'Report not yet completed',
                 'task': current_task.to_dict()
             }), 400
 
@@ -340,7 +340,7 @@ def get_result_json(task_id: str):
         })
 
     except Exception as e:
-        logger.exception(f"获取报告生成结果失败: {str(e)}")
+        logger.exception(f"Failed to get report generation result: {str(e)}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -349,24 +349,24 @@ def get_result_json(task_id: str):
 
 @report_bp.route('/download/<task_id>', methods=['GET'])
 def download_report(task_id: str):
-    """下载已生成的报告HTML文件"""
+    """Download generated report HTML file"""
     try:
         if not current_task or current_task.task_id != task_id:
             return jsonify({
                 'success': False,
-                'error': '任务不存在'
+                'error': 'Task does not exist'
             }), 404
 
         if current_task.status != "completed" or not current_task.report_file_path:
             return jsonify({
                 'success': False,
-                'error': '报告尚未完成或尚未保存'
+                'error': 'Report not yet completed or not saved'
             }), 400
 
         if not os.path.exists(current_task.report_file_path):
             return jsonify({
                 'success': False,
-                'error': '报告文件不存在或已被删除'
+                'error': 'Report file does not exist or has been deleted'
             }), 404
 
         download_name = current_task.report_file_name or os.path.basename(current_task.report_file_path)
@@ -378,7 +378,7 @@ def download_report(task_id: str):
         )
 
     except Exception as e:
-        logger.exception(f"下载报告失败: {str(e)}")
+        logger.exception(f"Failed to download report: {str(e)}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -387,28 +387,28 @@ def download_report(task_id: str):
 
 @report_bp.route('/cancel/<task_id>', methods=['POST'])
 def cancel_task(task_id: str):
-    """取消报告生成任务"""
+    """Cancel report generation task"""
     global current_task
 
     try:
         with task_lock:
             if current_task and current_task.task_id == task_id:
                 if current_task.status == "running":
-                    current_task.update_status("cancelled", 0, "用户取消任务")
+                    current_task.update_status("cancelled", 0, "Task cancelled by user")
                 current_task = None
 
                 return jsonify({
                     'success': True,
-                    'message': '任务已取消'
+                    'message': 'Task cancelled'
                 })
             else:
                 return jsonify({
                     'success': False,
-                    'error': '任务不存在或无法取消'
+                    'error': 'Task does not exist or cannot be cancelled'
                 }), 404
 
     except Exception as e:
-        logger.exception(f"取消报告生成任务失败: {str(e)}")
+        logger.exception(f"Failed to cancel report generation task: {str(e)}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -417,12 +417,12 @@ def cancel_task(task_id: str):
 
 @report_bp.route('/templates', methods=['GET'])
 def get_templates():
-    """获取可用模板列表"""
+    """Get available template list"""
     try:
         if not report_agent:
             return jsonify({
                 'success': False,
-                'error': 'Report Engine未初始化'
+                'error': 'Report Engine not initialized'
             }), 500
 
         template_dir = settings.TEMPLATE_DIR
@@ -439,11 +439,11 @@ def get_templates():
                         templates.append({
                             'name': filename.replace('.md', ''),
                             'filename': filename,
-                            'description': content.split('\n')[0] if content else '无描述',
+                            'description': content.split('\n')[0] if content else 'No description',
                             'size': len(content)
                         })
                     except Exception as e:
-                        logger.exception(f"读取模板失败 {filename}: {str(e)}")
+                        logger.exception(f"Failed to read template {filename}: {str(e)}")
 
         return jsonify({
             'success': True,
@@ -452,86 +452,86 @@ def get_templates():
         })
 
     except Exception as e:
-        logger.exception(f"获取可用模板列表失败: {str(e)}")
+        logger.exception(f"Failed to get available template list: {str(e)}")
         return jsonify({
             'success': False,
             'error': str(e)
         }), 500
 
 
-# 错误处理
+# Error handling
 @report_bp.errorhandler(404)
 def not_found(error):
-    logger.exception(f"API端点不存在: {str(error)}")
+    logger.exception(f"API endpoint does not exist: {str(error)}")
     return jsonify({
         'success': False,
-        'error': 'API端点不存在'
+        'error': 'API endpoint does not exist'
     }), 404
 
 
 @report_bp.errorhandler(500)
 def internal_error(error):
-    logger.exception(f"服务器内部错误: {str(error)}")
+    logger.exception(f"Internal server error: {str(error)}")
     return jsonify({
         'success': False,
-        'error': '服务器内部错误'
+        'error': 'Internal server error'
     }), 500
 
 
 def clear_report_log():
-    """清空report.log文件"""
+    """Clear report.log file"""
     try:
         log_file = settings.LOG_FILE
         with open(log_file, 'w', encoding='utf-8') as f:
             f.write('')
-        logger.info(f"已清空日志文件: {log_file}")
+        logger.info(f"Cleared log file: {log_file}")
     except Exception as e:
-        logger.exception(f"清空日志文件失败: {str(e)}")
+        logger.exception(f"Failed to clear log file: {str(e)}")
 
 
 @report_bp.route('/log', methods=['GET'])
 def get_report_log():
-    """获取report.log内容"""
+    """Get report.log content"""
     try:
         log_file = settings.LOG_FILE
-        
+
         if not os.path.exists(log_file):
             return jsonify({
                 'success': True,
                 'log_lines': []
             })
-        
+
         with open(log_file, 'r', encoding='utf-8') as f:
             lines = f.readlines()
-        
-        # 清理行尾的换行符
+
+        # Clean line endings
         log_lines = [line.rstrip('\n\r') for line in lines if line.strip()]
-        
+
         return jsonify({
             'success': True,
             'log_lines': log_lines
         })
-        
+
     except Exception as e:
-        logger.exception(f"读取日志失败: {str(e)}")
+        logger.exception(f"Failed to read log: {str(e)}")
         return jsonify({
             'success': False,
-            'error': f'读取日志失败: {str(e)}'
+            'error': f'Failed to read log: {str(e)}'
         }), 500
 
 
 @report_bp.route('/log/clear', methods=['POST'])
 def clear_log():
-    """手动清空日志"""
+    """Manually clear log"""
     try:
         clear_report_log()
         return jsonify({
             'success': True,
-            'message': '日志已清空'
+            'message': 'Log cleared'
         })
     except Exception as e:
-        logger.exception(f"清空日志失败: {str(e)}")
+        logger.exception(f"Failed to clear log: {str(e)}")
         return jsonify({
             'success': False,
-            'error': f'清空日志失败: {str(e)}'
+            'error': f'Failed to clear log: {str(e)}'
         }), 500

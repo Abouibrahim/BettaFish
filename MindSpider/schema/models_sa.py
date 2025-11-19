@@ -1,8 +1,8 @@
 """
-MindSpider 数据库ORM模型（SQLAlchemy 2.x）
+MindSpider databaseORM模型（SQLAlchemy 2.x）
 
-此模块定义 MindSpider 扩展表（与原 MediaCrawler 表解耦）的 ORM 模型。
-数据模型定义位置：
+此模块定义 MindSpider 扩展table（与原 MediaCrawler table解耦）的 ORM 模型。
+data模型定义位置：
 - 本文件（MindSpider/schema/models_sa.py）
 """
 

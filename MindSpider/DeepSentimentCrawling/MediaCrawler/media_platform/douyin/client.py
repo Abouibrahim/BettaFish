@@ -1,12 +1,12 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：
 # 1. 不得用于任何商业用途。
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。
-# 3. 不得进行大规模爬取或对平台造成运营干扰。
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。
+# 3. 不得进行大规模crawl或对platform造成运营干扰。
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。
 # 5. 不得用于任何非法或不当的用途。
 #
 # 详细许可条款请参阅项目根目录下的LICENSE文件。
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。
 
 import asyncio
 import copy
@@ -30,7 +30,7 @@ class DouYinClient(AbstractApiClient):
 
     def __init__(
         self,
-        timeout=60,  # 若开启爬取媒体选项，抖音的短视频需要更久的超时时间
+        timeout=60,  # 若开启crawl媒体选项，Douyin的短视频need更久的超时时间
         proxy=None,
         *,
         headers: Dict,
@@ -87,7 +87,7 @@ class DouYinClient(AbstractApiClient):
         params.update(common_params)
         query_string = urllib.parse.urlencode(params)
 
-        # 20240927 a-bogus更新（JS版本）
+        # 20240927 a-bogusupdate（JS版本）
         post_data = {}
         if request_method == "POST":
             post_data = params
@@ -199,7 +199,7 @@ class DouYinClient(AbstractApiClient):
 
     async def get_sub_comments(self, aweme_id: str, comment_id: str, cursor: int = 0):
         """
-            获取子评论
+            get子comment
         """
         uri = "/aweme/v1/web/comment/list/reply/"
         params = {
@@ -224,13 +224,13 @@ class DouYinClient(AbstractApiClient):
         max_count: int = 10,
     ):
         """
-        获取帖子的所有评论，包括子评论
+        get帖子的allcomment，包括子comment
         :param aweme_id: 帖子ID
         :param crawl_interval: 抓取间隔
-        :param is_fetch_sub_comments: 是否抓取子评论
-        :param callback: 回调函数，用于处理抓取到的评论
-        :param max_count: 一次帖子爬取的最大评论数量
-        :return: 评论列表
+        :param is_fetch_sub_comments: 是否抓取子comment
+        :param callback: 回调函数，用于处理抓取到的comment
+        :param max_count: 一次帖子crawl的maximumcomment数量
+        :return: comment列table
         """
         result = []
         comments_has_more = 1
@@ -245,13 +245,13 @@ class DouYinClient(AbstractApiClient):
             if len(result) + len(comments) > max_count:
                 comments = comments[:max_count - len(result)]
             result.extend(comments)
-            if callback:  # 如果有回调函数，就执行回调函数
+            if callback:  # 如果有回调函数，就execute回调函数
                 await callback(aweme_id, comments)
 
             await asyncio.sleep(crawl_interval)
             if not is_fetch_sub_comments:
                 continue
-            # 获取二级评论
+            # get二级comment
             for comment in comments:
                 reply_comment_total = comment.get("reply_comment_total")
 
@@ -269,7 +269,7 @@ class DouYinClient(AbstractApiClient):
                         if not sub_comments:
                             continue
                         result.extend(sub_comments)
-                        if callback:  # 如果有回调函数，就执行回调函数
+                        if callback:  # 如果有回调函数，就execute回调函数
                             await callback(aweme_id, sub_comments)
                         await asyncio.sleep(crawl_interval)
         return result
@@ -322,12 +322,12 @@ class DouYinClient(AbstractApiClient):
                 else:
                     return response.content
             except httpx.HTTPError as exc:  # some wrong when call httpx.request method, such as connection error, client error, server error or response status code is not 2xx
-                utils.logger.error(f"[DouYinClient.get_aweme_media] {exc.__class__.__name__} for {exc.request.url} - {exc}")  # 保留原始异常类型名称，以便开发者调试
+                utils.logger.error(f"[DouYinClient.get_aweme_media] {exc.__class__.__name__} for {exc.request.url} - {exc}")  # 保留原始exception类型名称，以便开发者调试
                 return None
 
     async def resolve_short_url(self, short_url: str) -> str:
         """
-        解析抖音短链接,获取重定向后的真实URL
+        解析Douyin短链接,get重定向后的真实URL
         Args:
             short_url: 短链接,如 https://v.douyin.com/iF12345ABC/
         Returns:

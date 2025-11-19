@@ -1,12 +1,12 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：  
 # 1. 不得用于任何商业用途。  
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。  
-# 3. 不得进行大规模爬取或对平台造成运营干扰。  
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。   
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。  
+# 3. 不得进行大规模crawl或对platform造成运营干扰。  
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。   
 # 5. 不得用于任何非法或不当的用途。
 #   
 # 详细许可条款请参阅项目根目录下的LICENSE文件。  
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。  
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。  
 
 
 # -*- coding: utf-8 -*-
@@ -26,19 +26,19 @@ class ExpiringLocalCache(AbstractCache):
 
     def __init__(self, cron_interval: int = 10):
         """
-        初始化本地缓存
+        initialize本地缓存
         :param cron_interval: 定时清楚cache的时间间隔
         :return:
         """
         self._cron_interval = cron_interval
         self._cache_container: Dict[str, Tuple[Any, float]] = {}
         self._cron_task: Optional[asyncio.Task] = None
-        # 开启定时清理任务
+        # 开启定时cleanuptask
         self._schedule_clear()
 
     def __del__(self):
         """
-        析构函数，清理定时任务
+        析构函数，cleanup定时task
         :return:
         """
         if self._cron_task is not None:
@@ -46,7 +46,7 @@ class ExpiringLocalCache(AbstractCache):
 
     def get(self, key: str) -> Optional[Any]:
         """
-        从缓存中获取键的值
+        从缓存中get键的值
         :param key:
         :return:
         """
@@ -54,7 +54,7 @@ class ExpiringLocalCache(AbstractCache):
         if value is None:
             return None
 
-        # 如果键已过期，则删除键并返回None
+        # 如果键已过期，则delete键并返回None
         if expire_time < time.time():
             del self._cache_container[key]
             return None
@@ -73,7 +73,7 @@ class ExpiringLocalCache(AbstractCache):
 
     def keys(self, pattern: str) -> List[str]:
         """
-        获取所有符合pattern的key
+        getall符合pattern的key
         :param pattern: 匹配模式
         :return:
         """
@@ -88,7 +88,7 @@ class ExpiringLocalCache(AbstractCache):
 
     def _schedule_clear(self):
         """
-        开启定时清理任务,
+        开启定时cleanuptask,
         :return:
         """
 
@@ -102,7 +102,7 @@ class ExpiringLocalCache(AbstractCache):
 
     def _clear(self):
         """
-        根据过期时间清理缓存
+        根据过期时间cleanup缓存
         :return:
         """
         for key, (value, expire_time) in self._cache_container.items():
@@ -111,7 +111,7 @@ class ExpiringLocalCache(AbstractCache):
 
     async def _start_clear_cron(self):
         """
-        开启定时清理任务
+        开启定时cleanuptask
         :return:
         """
         while True:

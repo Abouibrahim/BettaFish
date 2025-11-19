@@ -1,12 +1,12 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：  
 # 1. 不得用于任何商业用途。  
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。  
-# 3. 不得进行大规模爬取或对平台造成运营干扰。  
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。   
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。  
+# 3. 不得进行大规模crawl或对platform造成运营干扰。  
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。   
 # 5. 不得用于任何非法或不当的用途。
 #   
 # 详细许可条款请参阅项目根目录下的LICENSE文件。  
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。  
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。  
 
 
 # -*- coding: utf-8 -*-
@@ -36,7 +36,7 @@ class BilibiliSign:
 
     def get_salt(self) -> str:
         """
-        获取加盐的 key
+        get加盐的 key
         :return:
         """
         salt = ""
@@ -70,9 +70,9 @@ class BilibiliSign:
 
 def parse_video_info_from_url(url: str) -> VideoUrlInfo:
     """
-    从B站视频URL中解析出视频ID
+    从Bilibili视频URL中解析出视频ID
     Args:
-        url: B站视频链接
+        url: Bilibili视频链接
             - https://www.bilibili.com/video/BV1dwuKzmE26/?spm_id_from=333.1387.homepage.video_card.click
             - https://www.bilibili.com/video/BV1d54y1g7db
             - BV1d54y1g7db (直接传入BV号)
@@ -83,7 +83,7 @@ def parse_video_info_from_url(url: str) -> VideoUrlInfo:
     if url.startswith("BV"):
         return VideoUrlInfo(video_id=url)
 
-    # 使用正则表达式提取BV号
+    # 使用正则table达式extractBV号
     # 匹配 /video/BV... 或 /video/av... 格式
     bv_pattern = r'/video/(BV[a-zA-Z0-9]+)'
     match = re.search(bv_pattern, url)
@@ -92,14 +92,14 @@ def parse_video_info_from_url(url: str) -> VideoUrlInfo:
         video_id = match.group(1)
         return VideoUrlInfo(video_id=video_id)
 
-    raise ValueError(f"无法从URL中解析出视频ID: {url}")
+    raise ValueError(f"unable to从URL中解析出视频ID: {url}")
 
 
 def parse_creator_info_from_url(url: str) -> CreatorUrlInfo:
     """
-    从B站创作者空间URL中解析出创作者ID
+    从Bilibili创作者空间URL中解析出创作者ID
     Args:
-        url: B站创作者空间链接
+        url: Bilibili创作者空间链接
             - https://space.bilibili.com/434377496?spm_id_from=333.1007.0.0
             - https://space.bilibili.com/20813884
             - 434377496 (直接传入UID)
@@ -110,7 +110,7 @@ def parse_creator_info_from_url(url: str) -> CreatorUrlInfo:
     if url.isdigit():
         return CreatorUrlInfo(creator_id=url)
 
-    # 使用正则表达式提取UID
+    # 使用正则table达式extractUID
     # 匹配 /space.bilibili.com/数字 格式
     uid_pattern = r'space\.bilibili\.com/(\d+)'
     match = re.search(uid_pattern, url)
@@ -119,7 +119,7 @@ def parse_creator_info_from_url(url: str) -> CreatorUrlInfo:
         creator_id = match.group(1)
         return CreatorUrlInfo(creator_id=creator_id)
 
-    raise ValueError(f"无法从URL中解析出创作者ID: {url}")
+    raise ValueError(f"unable to从URL中解析出创作者ID: {url}")
 
 
 if __name__ == '__main__':

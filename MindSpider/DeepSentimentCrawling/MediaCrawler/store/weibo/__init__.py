@@ -1,12 +1,12 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：
 # 1. 不得用于任何商业用途。
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。
-# 3. 不得进行大规模爬取或对平台造成运营干扰。
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。
+# 3. 不得进行大规模crawl或对platform造成运营干扰。
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。
 # 5. 不得用于任何非法或不当的用途。
 #
 # 详细许可条款请参阅项目根目录下的LICENSE文件。
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。
 
 # -*- coding: utf-8 -*-
 # @Author  : relakkes@gmail.com
@@ -72,7 +72,7 @@ async def update_weibo_note(note_item: Dict):
     content_text = mblog.get("text")
     clean_text = re.sub(r"<.*?>", "", content_text)
     save_content_item = {
-        # 微博信息
+        # Weibo信息
         "note_id": note_id,
         "content": clean_text,
         "create_time": utils.rfc2822_to_timestamp(mblog.get("created_at")),
@@ -84,7 +84,7 @@ async def update_weibo_note(note_item: Dict):
         "note_url": f"https://m.weibo.cn/detail/{note_id}",
         "ip_location": mblog.get("region_name", "").replace("发布于 ", ""),
 
-        # 用户信息
+        # user信息
         "user_id": str(user_info.get("id")),
         "nickname": user_info.get("screen_name", ""),
         "gender": user_info.get("gender", ""),
@@ -140,7 +140,7 @@ async def update_weibo_note_comment(note_id: str, comment_item: Dict):
         "ip_location": comment_item.get("source", "").replace("来自", ""),
         "parent_comment_id": comment_item.get("rootid", ""),
 
-        # 用户信息
+        # user信息
         "user_id": str(user_info.get("id")),
         "nickname": user_info.get("screen_name", ""),
         "gender": user_info.get("gender", ""),

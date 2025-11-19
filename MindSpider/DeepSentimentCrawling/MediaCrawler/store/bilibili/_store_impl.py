@@ -1,18 +1,18 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：
 # 1. 不得用于任何商业用途。
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。
-# 3. 不得进行大规模爬取或对平台造成运营干扰。
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。
+# 3. 不得进行大规模crawl或对platform造成运营干扰。
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。
 # 5. 不得用于任何非法或不当的用途。
 #
 # 详细许可条款请参阅项目根目录下的LICENSE文件。
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。
 
 
 # -*- coding: utf-8 -*-
 # @Author  : persist1@126.com
 # @Time    : 2025/9/5 19:34
-# @Desc    : B站存储实现类
+# @Desc    : Bilibili存储实现类
 import asyncio
 import csv
 import json
@@ -119,7 +119,7 @@ class BiliDbStoreImplement(AbstractStore):
             content_item: content item dict
         """
         video_id = content_item.get("video_id")
-        # 确保 video_id 为整数类型，匹配数据库 BigInteger 字段
+        # 确保 video_id 为整数类型，匹配database BigInteger 字段
         if video_id is not None:
             video_id = int(video_id) if not isinstance(video_id, int) else video_id
         async with get_session() as session:
@@ -142,7 +142,7 @@ class BiliDbStoreImplement(AbstractStore):
             comment_item: comment item dict
         """
         comment_id = comment_item.get("comment_id")
-        # 确保 comment_id 为整数类型，匹配数据库 BigInteger 字段
+        # 确保 comment_id 为整数类型，匹配database BigInteger 字段
         if comment_id is not None:
             comment_id = int(comment_id) if not isinstance(comment_id, int) else comment_id
         async with get_session() as session:
@@ -165,7 +165,7 @@ class BiliDbStoreImplement(AbstractStore):
             creator: creator item dict
         """
         creator_id = creator.get("user_id")
-        # 确保 creator_id 为整数类型，匹配数据库 BigInteger 字段
+        # 确保 creator_id 为整数类型，匹配database BigInteger 字段
         if creator_id is not None:
             creator_id = int(creator_id) if not isinstance(creator_id, int) else creator_id
         async with get_session() as session:
@@ -189,7 +189,7 @@ class BiliDbStoreImplement(AbstractStore):
         """
         up_id = contact_item.get("up_id")
         fan_id = contact_item.get("fan_id")
-        # 确保 up_id 和 fan_id 为整数类型，匹配数据库 BigInteger 字段
+        # 确保 up_id 和 fan_id 为整数类型，匹配database BigInteger 字段
         if up_id is not None:
             up_id = int(up_id) if not isinstance(up_id, int) else up_id
         if fan_id is not None:

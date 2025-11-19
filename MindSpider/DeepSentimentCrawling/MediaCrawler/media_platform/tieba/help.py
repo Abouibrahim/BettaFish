@@ -1,12 +1,12 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：  
 # 1. 不得用于任何商业用途。  
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。  
-# 3. 不得进行大规模爬取或对平台造成运营干扰。  
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。   
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。  
+# 3. 不得进行大规模crawl或对platform造成运营干扰。  
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。   
 # 5. 不得用于任何非法或不当的用途。
 #   
 # 详细许可条款请参阅项目根目录下的LICENSE文件。  
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。  
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。  
 
 
 # -*- coding: utf-8 -*-
@@ -33,12 +33,12 @@ class TieBaExtractor:
     @staticmethod
     def extract_search_note_list(page_content: str) -> List[TiebaNote]:
         """
-        提取贴吧帖子列表，这里提取的关键词搜索结果页的数据，还缺少帖子的回复数和回复页等数据
+        extractTieba帖子列table，这里extract的keyword搜索结果页的data，还missing帖子的回复数和回复页等data
         Args:
-            page_content: 页面内容的HTML字符串
+            page_content: 页面content的HTML字符串
 
         Returns:
-            包含帖子信息的字典列表
+            包含帖子信息的字典列table
         """
         xpath_selector = "//div[@class='s_post']"
         post_list = Selector(text=page_content).xpath(xpath_selector)
@@ -62,7 +62,7 @@ class TieBaExtractor:
 
     def extract_tieba_note_list(self, page_content: str) -> List[TiebaNote]:
         """
-        提取贴吧帖子列表
+        extractTieba帖子列table
         Args:
             page_content:
 
@@ -97,7 +97,7 @@ class TieBaExtractor:
 
     def extract_note_detail(self, page_content: str) -> TiebaNote:
         """
-        提取贴吧帖子详情
+        extractTieba帖子详情
         Args:
             page_content:
 
@@ -111,7 +111,7 @@ class TieBaExtractor:
         # 帖子回复数、回复页数
         thread_num_infos = content_selector.xpath(
             "//div[@id='thread_theme_5']//li[@class='l_reply_num']//span[@class='red']")
-        # IP地理位置、发表时间
+        # IP地理位置、发table时间
         other_info_content = content_selector.xpath(".//div[@class='post-tail-wrap']").get(default="").strip()
         ip_location, publish_time = self.extract_ip_and_pub_time(other_info_content)
         note = TiebaNote(note_id=note_id, title=content_selector.xpath("//title/text()").get(default='').strip(),
@@ -129,12 +129,12 @@ class TieBaExtractor:
                          publish_time=publish_time,
                          total_replay_num=thread_num_infos[0].xpath("./text()").get(default='').strip(),
                          total_replay_page=thread_num_infos[1].xpath("./text()").get(default='').strip(), )
-        note.title = note.title.replace(f"【{note.tieba_name}】_百度贴吧", "")
+        note.title = note.title.replace(f"【{note.tieba_name}】_百度Tieba", "")
         return note
 
     def extract_tieba_note_parment_comments(self, page_content: str, note_id: str) -> List[TiebaComment]:
         """
-        提取贴吧帖子一级评论
+        extractTieba帖子一级comment
         Args:
             page_content:
             note_id:
@@ -171,7 +171,7 @@ class TieBaExtractor:
 
     def extract_tieba_note_sub_comments(self, page_content: str, parent_comment: TiebaComment) -> List[TiebaComment]:
         """
-        提取贴吧帖子二级评论
+        extractTieba帖子二级comment
         Args:
             page_content:
             parent_comment:
@@ -206,7 +206,7 @@ class TieBaExtractor:
 
     def extract_creator_info(self, html_content: str) -> TiebaCreator:
         """
-        提取贴吧创作者信息
+        extractTieba创作者信息
         Args:
             html_content:
 
@@ -242,7 +242,7 @@ class TieBaExtractor:
         html_content: str
     ) -> List[str]:
         """
-        提取贴吧创作者主页的帖子列表
+        extractTieba创作者主页的帖子列table
         Args:
             html_content:
 
@@ -262,7 +262,7 @@ class TieBaExtractor:
 
     def extract_ip_and_pub_time(self, html_content: str) -> Tuple[str, str]:
         """
-        提取IP位置和发布时间
+        extractIP位置和发布时间
         Args:
             html_content:
 
@@ -277,7 +277,7 @@ class TieBaExtractor:
     @staticmethod
     def extract_ip(html_content: str) -> str:
         """
-        提取IP
+        extractIP
         Args:
             html_content:
 
@@ -292,7 +292,7 @@ class TieBaExtractor:
     @staticmethod
     def extract_gender(html_content: str) -> str:
         """
-        提取性别
+        extract性别
         Args:
             html_content:
 
@@ -308,7 +308,7 @@ class TieBaExtractor:
     @staticmethod
     def extract_follow_and_fans(selectors: List[Selector]) -> Tuple[str, str]:
         """
-        提取关注数和粉丝数
+        extract关注数和粉丝数
         Args:
             selectors:
 
@@ -336,7 +336,7 @@ class TieBaExtractor:
     @staticmethod
     def extract_data_field_value(selector: Selector) -> Dict:
         """
-        提取data-field的值
+        extractdata-field的值
         Args:
             selector:
 
@@ -351,7 +351,7 @@ class TieBaExtractor:
             unescaped_json_str = html.unescape(data_field_value)
             data_field_dict_value = json.loads(unescaped_json_str)
         except Exception as ex:
-            print(f"extract_data_field_value，错误信息：{ex}, 尝试使用其他方式解析")
+            print(f"extract_data_field_value，error信息：{ex}, 尝试使用其他方式解析")
             data_field_dict_value = {}
         return data_field_dict_value
 

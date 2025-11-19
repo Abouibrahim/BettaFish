@@ -27,8 +27,8 @@ class ReportStructureNode(StateMutationNode):
         初始化报告结构节点
         
         Args:
-            llm_client: LLM客户端
-            query: 用户查询
+            llm_client: LLM client
+            query: User query
         """
         super().__init__(llm_client, "ReportStructureNode")
         self.query = query

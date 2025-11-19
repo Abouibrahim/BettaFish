@@ -7,7 +7,7 @@ import math
 import inspect
 from typing import Dict, List, Optional, Tuple
 
-# ========== 单卡锁定（在导入 torch/transformers 前执行） ==========
+# ========== Single GPU lock (execute before importing torch/transformers) ==========
 def _extract_gpu_arg(argv: List[str], default: str = "0") -> str:
     for i, arg in enumerate(argv):
         if arg.startswith("--gpu="):
@@ -21,12 +21,12 @@ try:
     gpu_to_use = _extract_gpu_arg(sys.argv, default="0")
 except Exception:
     gpu_to_use = "0"
-# 若未设置或暴露了多卡，则强制只暴露单卡（默认0）以确保直接运行稳定
+# If not set or multiple GPUs exposed, force single GPU exposure (default 0) to ensure stable direct execution
 if (not env_vis) or ("," in env_vis):
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu_to_use
 os.environ.setdefault("CUDA_DEVICE_ORDER", "PCI_BUS_ID")
 
-# 清理可能由外部启动器注入的分布式环境变量，避免误触多卡/分布式
+# Clear distributed environment variables that may be injected by external launchers to avoid triggering multi-GPU/distributed
 for _k in ["RANK", "LOCAL_RANK", "WORLD_SIZE"]:
     os.environ.pop(_k, None)
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
@@ -52,7 +52,7 @@ try:
 except Exception:  # pragma: no cover
     EarlyStoppingCallback = None  # type: ignore
 
-# 预置可选中文基座模型（可扩展）
+# Preset optional Chinese backbone models (extensible)
 BACKBONE_CANDIDATES: List[Tuple[str, str]] = [
     ("1) google-bert/bert-base-chinese", "google-bert/bert-base-chinese"),
     ("2) hfl/chinese-roberta-wwm-ext-large", "hfl/chinese-roberta-wwm-ext-large"),
@@ -66,11 +66,11 @@ BACKBONE_CANDIDATES: List[Tuple[str, str]] = [
 
 
 def prompt_backbone_interactive(current_id: str) -> str:
-    """交互式选择基座模型。
+    """Interactively select backbone model.
 
-    - 当处于非交互环境（stdin 非 TTY）或设置了环境变量 NON_INTERACTIVE=1 时，直接返回 current_id。
-    - 用户可输入序号选择预置项，或直接输入任意 Hugging Face 模型 ID。
-    - 空回车使用当前默认。
+    - When in non-interactive environment (stdin is not TTY) or NON_INTERACTIVE=1 is set, directly return current_id.
+    - Users can input number to select preset option, or directly input any Hugging Face model ID.
+    - Empty enter uses current default.
     """
     if os.environ.get("NON_INTERACTIVE", "0") == "1":
         return current_id
@@ -218,13 +218,13 @@ def autodetect_columns(df: pd.DataFrame, text_col: str, label_col: str) -> Tuple
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="使用 google-bert/bert-base-chinese 在本目录数据集上进行文本分类微调")
+    parser = argparse.ArgumentParser(description="Fine-tune text classification using google-bert/bert-base-chinese on local dataset")
     parser.add_argument("--train_file", type=str, default="./dataset/web_text_zh_train.csv")
     parser.add_argument("--valid_file", type=str, default="./dataset/web_text_zh_valid.csv")
-    parser.add_argument("--text_col", type=str, default="auto", help="文本列名，默认自动识别")
-    parser.add_argument("--label_col", type=str, default="auto", help="标签列名，默认自动识别")
-    parser.add_argument("--model_root", type=str, default="./model", help="本地模型根目录")
-    parser.add_argument("--pretrained_name", type=str, default="google-bert/bert-base-chinese", help="Hugging Face 模型ID；留空则进入交互选择")
+    parser.add_argument("--text_col", type=str, default="auto", help="Text column name, auto-detect by default")
+    parser.add_argument("--label_col", type=str, default="auto", help="Label column name, auto-detect by default")
+    parser.add_argument("--model_root", type=str, default="./model", help="Local model root directory")
+    parser.add_argument("--pretrained_name", type=str, default="google-bert/bert-base-chinese", help="Hugging Face model ID; leave empty to enter interactive selection")
     parser.add_argument("--save_subdir", type=str, default="bert-chinese-classifier")
     parser.add_argument("--max_length", type=int, default=128)
     parser.add_argument("--batch_size", type=int, default=64)
@@ -234,10 +234,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--warmup_ratio", type=float, default=0.1)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--fp16", action="store_true")
-    parser.add_argument("--gpu", type=str, default=os.environ.get("CUDA_VISIBLE_DEVICES", "0"), help="指定单卡 GPU，如 0 或 1")
-    parser.add_argument("--eval_fraction", type=float, default=0.25, help="每多少个 epoch 做一次评估与保存，例如 0.25 表示每四分之一个 epoch")
-    parser.add_argument("--early_stop_patience", type=int, default=5, help="早停耐心（以评估轮次计）")
-    parser.add_argument("--early_stop_threshold", type=float, default=0.0, help="早停最小改善阈值（与 metric_for_best_model 同单位）")
+    parser.add_argument("--gpu", type=str, default=os.environ.get("CUDA_VISIBLE_DEVICES", "0"), help="Specify single GPU, such as 0 or 1")
+    parser.add_argument("--eval_fraction", type=float, default=0.25, help="How often to evaluate and save per epoch, e.g. 0.25 means every quarter epoch")
+    parser.add_argument("--early_stop_patience", type=int, default=5, help="Early stopping patience (in evaluation rounds)")
+    parser.add_argument("--early_stop_threshold", type=float, default=0.0, help="Early stopping minimum improvement threshold (same unit as metric_for_best_model)")
     return parser.parse_args()
 
 
@@ -478,7 +478,7 @@ def main() -> None:
     except Exception:
         pass
 
-    print(f"微调完成，模型已保存到: {output_dir}")
+    print(f"Fine-tuning completed, model saved to: {output_dir}")
 
 
 if __name__ == "__main__":

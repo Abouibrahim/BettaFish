@@ -1,17 +1,17 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：
 # 1. 不得用于任何商业用途。
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。
-# 3. 不得进行大规模爬取或对平台造成运营干扰。
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。
+# 3. 不得进行大规模crawl或对platform造成运营干扰。
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。
 # 5. 不得用于任何非法或不当的用途。
 #
 # 详细许可条款请参阅项目根目录下的LICENSE文件。
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。
 
 # -*- coding: utf-8 -*-
 # @Author  : relakkes@gmail.com
 # @Time    : 2023/12/2 18:44
-# @Desc    : B站爬虫
+# @Desc    : Bilibili爬虫
 
 import asyncio
 import os
@@ -64,7 +64,7 @@ class BilibiliCrawler(AbstractCrawler):
             playwright_proxy_format, httpx_proxy_format = utils.format_proxy_info(ip_proxy_info)
 
         async with async_playwright() as playwright:
-            # 根据配置选择启动模式
+            # 根据configuration选择启动模式
             if config.ENABLE_CDP_MODE:
                 utils.logger.info("[BilibiliCrawler] 使用CDP模式启动浏览器")
                 self.browser_context = await self.launch_browser_with_cdp(
@@ -139,7 +139,7 @@ class BilibiliCrawler(AbstractCrawler):
         end: str = config.END_DAY,
     ) -> Tuple[str, str]:
         """
-        获取 bilibili 作品发布日期起始时间戳 pubtime_begin_s 与发布日期结束时间戳 pubtime_end_s
+        get bilibili 作品发布日期起始时间戳 pubtime_begin_s 与发布日期结束时间戳 pubtime_end_s
         ---
         :param start: 发布日期起始时间，YYYY-MM-DD
         :param end: 发布日期结束时间，YYYY-MM-DD
@@ -147,11 +147,11 @@ class BilibiliCrawler(AbstractCrawler):
         Note
         ---
         - 搜索的时间范围为 start 至 end，包含 start 和 end
-        - 若要搜索同一天的内容，为了包含 start 当天的搜索内容，则 pubtime_end_s 的值应该为 pubtime_begin_s 的值加上一天再减去一秒，即 start 当天的最后一秒
-            - 如仅搜索 2024-01-05 的内容，pubtime_begin_s = 1704384000，pubtime_end_s = 1704470399
+        - 若要搜索同一天的content，为了包含 start 当天的搜索content，则 pubtime_end_s 的值应该为 pubtime_begin_s 的值加上一天再减去一秒，即 start 当天的最后一秒
+            - 如仅搜索 2024-01-05 的content，pubtime_begin_s = 1704384000，pubtime_end_s = 1704470399
               转换为可读的 datetime 对象：pubtime_begin_s = datetime.datetime(2024, 1, 5, 0, 0)，pubtime_end_s = datetime.datetime(2024, 1, 5, 23, 59, 59)
-        - 若要搜索 start 至 end 的内容，为了包含 end 当天的搜索内容，则 pubtime_end_s 的值应该为 pubtime_end_s 的值加上一天再减去一秒，即 end 当天的最后一秒
-            - 如搜索 2024-01-05 - 2024-01-06 的内容，pubtime_begin_s = 1704384000，pubtime_end_s = 1704556799
+        - 若要搜索 start 至 end 的content，为了包含 end 当天的搜索content，则 pubtime_end_s 的值应该为 pubtime_end_s 的值加上一天再减去一秒，即 end 当天的最后一秒
+            - 如搜索 2024-01-05 - 2024-01-06 的content，pubtime_begin_s = 1704384000，pubtime_end_s = 1704556799
               转换为可读的 datetime 对象：pubtime_begin_s = datetime.datetime(2024, 1, 5, 0, 0)，pubtime_end_s = datetime.datetime(2024, 1, 6, 23, 59, 59)
         """
         # 转换 start 与 end 为 datetime 对象
@@ -159,7 +159,7 @@ class BilibiliCrawler(AbstractCrawler):
         end_day: datetime = datetime.strptime(end, "%Y-%m-%d")
         if start_day > end_day:
             raise ValueError("Wrong time range, please check your start and end argument, to ensure that the start cannot exceed end")
-        elif start_day == end_day:  # 搜索同一天的内容
+        elif start_day == end_day:  # 搜索同一天的content
             end_day = (start_day + timedelta(days=1) - timedelta(seconds=1))  # 则将 end_day 设置为 start_day + 1 day - 1 second
         else:  # 搜索 start 至 end
             end_day = (end_day + timedelta(days=1) - timedelta(seconds=1))  # 则将 end_day 设置为 end_day + 1 day - 1 second
@@ -524,14 +524,14 @@ class BilibiliCrawler(AbstractCrawler):
                 headless=headless,
             )
 
-            # 显示浏览器信息
+            # show浏览器信息
             browser_info = await self.cdp_manager.get_browser_info()
             utils.logger.info(f"[BilibiliCrawler] CDP浏览器信息: {browser_info}")
 
             return browser_context
 
         except Exception as e:
-            utils.logger.error(f"[BilibiliCrawler] CDP模式启动失败，回退到标准模式: {e}")
+            utils.logger.error(f"[BilibiliCrawler] CDP模式启动failed，回退到标准模式: {e}")
             # 回退到标准模式
             chromium = playwright.chromium
             return await self.launch_browser(chromium, playwright_proxy, user_agent, headless)
@@ -539,7 +539,7 @@ class BilibiliCrawler(AbstractCrawler):
     async def close(self):
         """Close browser context"""
         try:
-            # 如果使用CDP模式，需要特殊处理
+            # 如果使用CDP模式，need特殊处理
             if self.cdp_manager:
                 await self.cdp_manager.cleanup()
                 self.cdp_manager = None

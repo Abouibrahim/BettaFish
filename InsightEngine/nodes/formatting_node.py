@@ -25,7 +25,7 @@ class ReportFormattingNode(BaseNode):
         初始化报告格式化节点
         
         Args:
-            llm_client: LLM客户端
+            llm_client: LLM client
         """
         super().__init__(llm_client, "ReportFormattingNode")
     

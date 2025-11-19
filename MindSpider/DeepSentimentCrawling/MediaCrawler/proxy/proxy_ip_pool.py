@@ -1,12 +1,12 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：
 # 1. 不得用于任何商业用途。
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。
-# 3. 不得进行大规模爬取或对平台造成运营干扰。
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。
+# 3. 不得进行大规模crawl或对platform造成运营干扰。
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。
 # 5. 不得用于任何非法或不当的用途。
 #
 # 详细许可条款请参阅项目根目录下的LICENSE文件。
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。
 
 # -*- coding: utf-8 -*-
 # @Author  : relakkes@gmail.com
@@ -65,7 +65,7 @@ class ProxyIpPool:
             f"[ProxyIpPool._is_valid_proxy] testing {proxy.ip} is it valid "
         )
         try:
-            # httpx 0.28.1 需要直接传入代理URL字符串，而不是字典
+            # httpx 0.28.1 need直接传入代理URL字符串，而不是字典
             if proxy.user and proxy.password:
                 proxy_url = f"http://{proxy.user}:{proxy.password}@{proxy.ip}:{proxy.port}"
             else:
@@ -86,7 +86,7 @@ class ProxyIpPool:
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
     async def get_proxy(self) -> IpInfoModel:
         """
-        从代理池中随机提取一个代理IP
+        从代理池中随机extract一个代理IP
         :return:
         """
         if len(self.proxy_list) == 0:

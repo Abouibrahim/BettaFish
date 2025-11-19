@@ -1,6 +1,6 @@
 """
-Deep Search Agent主类
-整合所有模块，实现完整的深度搜索流程
+Deep Search Agent Main Class
+Integrates all modules to implement complete deep search workflow
 """
 
 import json
@@ -26,76 +26,76 @@ from .utils import format_search_results_for_prompt
 
 
 class DeepSearchAgent:
-    """Deep Search Agent主类"""
-    
+    """Deep Search Agent Main Class"""
+
     def __init__(self, config: Optional[Settings] = None):
         """
-        初始化Deep Search Agent
-        
+        Initialize Deep Search Agent
+
         Args:
-            config: 可选配置对象（不填则用全局settings）
+            config: Optional configuration object (uses global settings if not provided)
         """
         self.config = config or settings
-        
-        # 初始化LLM客户端
+
+        # Initialize LLM client
         self.llm_client = self._initialize_llm()
-        
-        
-        # 初始化搜索工具集
+
+
+        # Initialize search tools
         self.search_agency = MediaCrawlerDB()
-        
-        # 初始化情感分析器
+
+        # Initialize sentiment analyzer
         self.sentiment_analyzer = multilingual_sentiment_analyzer
-        
-        # 初始化节点
+
+        # Initialize nodes
         self._initialize_nodes()
-        
-        # 状态
+
+        # State
         self.state = State()
-        
-        # 确保输出目录存在
+
+        # Ensure output directory exists
         os.makedirs(self.config.OUTPUT_DIR, exist_ok=True)
-        
-        logger.info(f"Insight Agent已初始化")
-        logger.info(f"使用LLM: {self.llm_client.get_model_info()}")
-        logger.info(f"搜索工具集: MediaCrawlerDB (支持5种本地数据库查询工具)")
-        logger.info(f"情感分析: WeiboMultilingualSentiment (支持22种语言的情感分析)")
+
+        logger.info(f"Insight Agent initialized")
+        logger.info(f"Using LLM: {self.llm_client.get_model_info()}")
+        logger.info(f"Search tools: MediaCrawlerDB (supports 5 local database query tools)")
+        logger.info(f"Sentiment analysis: WeiboMultilingualSentiment (supports sentiment analysis in 22 languages)")
     
     def _initialize_llm(self) -> LLMClient:
-        """初始化LLM客户端"""
+        """Initialize LLM client"""
         return LLMClient(
             api_key=self.config.INSIGHT_ENGINE_API_KEY,
             model_name=self.config.INSIGHT_ENGINE_MODEL_NAME,
             base_url=self.config.INSIGHT_ENGINE_BASE_URL,
         )
-    
+
     def _initialize_nodes(self):
-        """初始化处理节点"""
+        """Initialize processing nodes"""
         self.first_search_node = FirstSearchNode(self.llm_client)
         self.reflection_node = ReflectionNode(self.llm_client)
         self.first_summary_node = FirstSummaryNode(self.llm_client)
         self.reflection_summary_node = ReflectionSummaryNode(self.llm_client)
         self.report_formatting_node = ReportFormattingNode(self.llm_client)
-    
+
     def _validate_date_format(self, date_str: str) -> bool:
         """
-        验证日期格式是否为YYYY-MM-DD
-        
+        Validate date format is YYYY-MM-DD
+
         Args:
-            date_str: 日期字符串
-            
+            date_str: Date string
+
         Returns:
-            是否为有效格式
+            Whether format is valid
         """
         if not date_str:
             return False
-        
-        # 检查格式
+
+        # Check format
         pattern = r'^\d{4}-\d{2}-\d{2}$'
         if not re.match(pattern, date_str):
             return False
-        
-        # 检查日期是否有效
+
+        # Check if date is valid
         try:
             datetime.strptime(date_str, '%Y-%m-%d')
             return True
@@ -104,91 +104,91 @@ class DeepSearchAgent:
     
     def execute_search_tool(self, tool_name: str, query: str, **kwargs) -> DBResponse:
         """
-        执行指定的数据库查询工具（集成关键词优化中间件和情感分析）
-        
+        Execute specified database query tool (integrated with keyword optimization middleware and sentiment analysis)
+
         Args:
-            tool_name: 工具名称，可选值：
-                - "search_hot_content": 查找热点内容
-                - "search_topic_globally": 全局话题搜索
-                - "search_topic_by_date": 按日期搜索话题
-                - "get_comments_for_topic": 获取话题评论
-                - "search_topic_on_platform": 平台定向搜索
-                - "analyze_sentiment": 对查询结果进行情感分析
-            query: 搜索关键词/话题
-            **kwargs: 额外参数（如start_date, end_date, platform, limit, enable_sentiment等）
-                     enable_sentiment: 是否自动对搜索结果进行情感分析（默认True）
-            
+            tool_name: Tool name, options:
+                - "search_hot_content": Find hot content
+                - "search_topic_globally": Global topic search
+                - "search_topic_by_date": Search topic by date
+                - "get_comments_for_topic": Get topic comments
+                - "search_topic_on_platform": Platform-specific search
+                - "analyze_sentiment": Perform sentiment analysis on query results
+            query: Search keyword/topic
+            **kwargs: Additional parameters (e.g., start_date, end_date, platform, limit, enable_sentiment, etc.)
+                     enable_sentiment: Whether to automatically perform sentiment analysis on search results (default True)
+
         Returns:
-            DBResponse对象（可能包含情感分析结果）
+            DBResponse object (may contain sentiment analysis results)
         """
-        logger.info(f"  → 执行数据库查询工具: {tool_name}")
+        logger.info(f"  → Executing database query tool: {tool_name}")
         
-        # 对于热点内容搜索，不需要关键词优化（因为不需要query参数）
+        # For hot content search, keyword optimization is not needed (because query parameter is not required)
         if tool_name == "search_hot_content":
             time_period = kwargs.get("time_period", "week")
             limit = kwargs.get("limit", 100)
             response = self.search_agency.search_hot_content(time_period=time_period, limit=limit)
-            
-            # 检查是否需要进行情感分析
+
+            # Check if sentiment analysis is needed
             enable_sentiment = kwargs.get("enable_sentiment", True)
             if enable_sentiment and response.results and len(response.results) > 0:
-                logger.info(f"  🎭 开始对热点内容进行情感分析...")
+                logger.info(f"  Starting sentiment analysis on hot content...")
                 sentiment_analysis = self._perform_sentiment_analysis(response.results)
                 if sentiment_analysis:
-                    # 将情感分析结果添加到响应的parameters中
+                    # Add sentiment analysis results to response parameters
                     response.parameters["sentiment_analysis"] = sentiment_analysis
-                    logger.info(f"  ✅ 情感分析完成")
-            
+                    logger.info(f"  Sentiment analysis completed")
+
             return response
         
-        # 独立情感分析工具
+        # Independent sentiment analysis tool
         if tool_name == "analyze_sentiment":
-            texts = kwargs.get("texts", query)  # 可以通过texts参数传递，或使用query
+            texts = kwargs.get("texts", query)  # Can be passed via texts parameter, or use query
             sentiment_result = self.analyze_sentiment_only(texts)
-            
-            # 构建DBResponse格式的响应
+
+            # Build DBResponse formatted response
             return DBResponse(
                 tool_name="analyze_sentiment",
                 parameters={
                     "texts": texts if isinstance(texts, list) else [texts],
                     **kwargs
                 },
-                results=[],  # 情感分析不返回搜索结果
+                results=[],  # Sentiment analysis does not return search results
                 results_count=0,
                 metadata=sentiment_result
             )
         
-        # 对于需要搜索词的工具，使用关键词优化中间件
+        # For tools requiring search terms, use keyword optimization middleware
         optimized_response = keyword_optimizer.optimize_keywords(
             original_query=query,
-            context=f"使用{tool_name}工具进行查询"
+            context=f"Query using {tool_name} tool"
         )
-        
-        logger.info(f"  🔍 原始查询: '{query}'")
-        logger.info(f"  ✨ 优化后关键词: {optimized_response.optimized_keywords}")
-        
-        # 使用优化后的关键词进行多次查询并整合结果
+
+        logger.info(f"  Original query: '{query}'")
+        logger.info(f"  Optimized keywords: {optimized_response.optimized_keywords}")
+
+        # Use optimized keywords for multiple queries and aggregate results
         all_results = []
         total_count = 0
-        
+
         for keyword in optimized_response.optimized_keywords:
-            logger.info(f"    查询关键词: '{keyword}'")
+            logger.info(f"    Querying keyword: '{keyword}'")
             
             try:
                 if tool_name == "search_topic_globally":
-                    # 使用配置文件中的默认值，忽略agent提供的limit_per_table参数
+                    # Use default value from config, ignore limit_per_table parameter provided by agent
                     limit_per_table = self.config.DEFAULT_SEARCH_TOPIC_GLOBALLY_LIMIT_PER_TABLE
                     response = self.search_agency.search_topic_globally(topic=keyword, limit_per_table=limit_per_table)
                 elif tool_name == "search_topic_by_date":
                     start_date = kwargs.get("start_date")
                     end_date = kwargs.get("end_date")
-                    # 使用配置文件中的默认值，忽略agent提供的limit_per_table参数
+                    # Use default value from config, ignore limit_per_table parameter provided by agent
                     limit_per_table = self.config.DEFAULT_SEARCH_TOPIC_BY_DATE_LIMIT_PER_TABLE
                     if not start_date or not end_date:
-                        raise ValueError("search_topic_by_date工具需要start_date和end_date参数")
+                        raise ValueError("search_topic_by_date tool requires start_date and end_date parameters")
                     response = self.search_agency.search_topic_by_date(topic=keyword, start_date=start_date, end_date=end_date, limit_per_table=limit_per_table)
                 elif tool_name == "get_comments_for_topic":
-                    # 使用配置文件中的默认值，按关键词数量分配，但保证最小值
+                    # Use default value from config, distribute by keyword count, but ensure minimum value
                     limit = self.config.DEFAULT_GET_COMMENTS_FOR_TOPIC_LIMIT // len(optimized_response.optimized_keywords)
                     limit = max(limit, 50)
                     response = self.search_agency.get_comments_for_topic(topic=keyword, limit=limit)
@@ -196,33 +196,33 @@ class DeepSearchAgent:
                     platform = kwargs.get("platform")
                     start_date = kwargs.get("start_date")
                     end_date = kwargs.get("end_date")
-                    # 使用配置文件中的默认值，按关键词数量分配，但保证最小值
+                    # Use default value from config, distribute by keyword count, but ensure minimum value
                     limit = self.config.DEFAULT_SEARCH_TOPIC_ON_PLATFORM_LIMIT // len(optimized_response.optimized_keywords)
                     limit = max(limit, 30)
                     if not platform:
-                        raise ValueError("search_topic_on_platform工具需要platform参数")
+                        raise ValueError("search_topic_on_platform tool requires platform parameter")
                     response = self.search_agency.search_topic_on_platform(platform=platform, topic=keyword, start_date=start_date, end_date=end_date, limit=limit)
                 else:
-                    logger.info(f"    未知的搜索工具: {tool_name}，使用默认全局搜索")
+                    logger.info(f"    Unknown search tool: {tool_name}, using default global search")
                     response = self.search_agency.search_topic_globally(topic=keyword, limit_per_table=self.config.DEFAULT_SEARCH_TOPIC_GLOBALLY_LIMIT_PER_TABLE)
-                
-                # 收集结果
+
+                # Collect results
                 if response.results:
-                    logger.info(f"     找到 {len(response.results)} 条结果")
+                    logger.info(f"     Found {len(response.results)} results")
                     all_results.extend(response.results)
                     total_count += len(response.results)
                 else:
-                    logger.info(f"     未找到结果")
-                    
+                    logger.info(f"     No results found")
+
             except Exception as e:
-                logger.error(f"      查询'{keyword}'时出错: {str(e)}")
+                logger.error(f"      Error querying '{keyword}': {str(e)}")
                 continue
         
-        # 去重和整合结果
+        # Deduplicate and aggregate results
         unique_results = self._deduplicate_results(all_results)
-        logger.info(f"  总计找到 {total_count} 条结果，去重后 {len(unique_results)} 条")
-        
-        # 构建整合后的响应
+        logger.info(f"  Total found {total_count} results, {len(unique_results)} after deduplication")
+
+        # Build aggregated response
         integrated_response = DBResponse(
             tool_name=f"{tool_name}_optimized",
             parameters={
@@ -234,55 +234,55 @@ class DeepSearchAgent:
             results=unique_results,
             results_count=len(unique_results)
         )
-        
-        # 检查是否需要进行情感分析
+
+        # Check if sentiment analysis is needed
         enable_sentiment = kwargs.get("enable_sentiment", True)
         if enable_sentiment and unique_results and len(unique_results) > 0:
-            logger.info(f"  🎭 开始对搜索结果进行情感分析...")
+            logger.info(f"  Starting sentiment analysis on search results...")
             sentiment_analysis = self._perform_sentiment_analysis(unique_results)
             if sentiment_analysis:
-                # 将情感分析结果添加到响应的parameters中
+                # Add sentiment analysis results to response parameters
                 integrated_response.parameters["sentiment_analysis"] = sentiment_analysis
-                logger.info(f"  ✅ 情感分析完成")
-        
+                logger.info(f"  Sentiment analysis completed")
+
         return integrated_response
-    
+
     def _deduplicate_results(self, results: List) -> List:
         """
-        去重搜索结果
+        Deduplicate search results
         """
         seen = set()
         unique_results = []
-        
+
         for result in results:
-            # 使用URL或内容作为去重标识
+            # Use URL or content as deduplication identifier
             identifier = result.url if result.url else result.title_or_content[:100]
             if identifier not in seen:
                 seen.add(identifier)
                 unique_results.append(result)
-        
+
         return unique_results
-    
+
     def _perform_sentiment_analysis(self, results: List) -> Optional[Dict[str, Any]]:
         """
-        对搜索结果执行情感分析
-        
+        Perform sentiment analysis on search results
+
         Args:
-            results: 搜索结果列表
-            
+            results: List of search results
+
         Returns:
-            情感分析结果字典，如果失败则返回None
+            Sentiment analysis result dictionary, None if failed
         """
         try:
-            # 初始化情感分析器（如果尚未初始化且未被禁用）
+            # Initialize sentiment analyzer (if not yet initialized and not disabled)
             if not self.sentiment_analyzer.is_initialized and not self.sentiment_analyzer.is_disabled:
-                logger.info("    初始化情感分析模型...")
+                logger.info("    Initializing sentiment analysis model...")
                 if not self.sentiment_analyzer.initialize():
-                    logger.info("     情感分析模型初始化失败，将直接透传原始文本")
+                    logger.info("     Sentiment analysis model initialization failed, will pass through original text")
             elif self.sentiment_analyzer.is_disabled:
-                logger.info("     情感分析功能已禁用，直接透传原始文本")
+                logger.info("     Sentiment analysis feature disabled, passing through original text")
 
-            # 将查询结果转换为字典格式
+            # Convert query results to dictionary format
             results_dict = []
             for result in results:
                 result_dict = {
@@ -293,42 +293,42 @@ class DeepSearchAgent:
                     "publish_time": str(result.publish_time) if result.publish_time else None
                 }
                 results_dict.append(result_dict)
-            
-            # 执行情感分析
+
+            # Perform sentiment analysis
             sentiment_analysis = self.sentiment_analyzer.analyze_query_results(
                 query_results=results_dict,
                 text_field="content",
                 min_confidence=0.5
             )
-            
+
             return sentiment_analysis.get("sentiment_analysis")
-            
+
         except Exception as e:
-            logger.exception(f"    ❌ 情感分析过程中发生错误: {str(e)}")
+            logger.exception(f"    Error during sentiment analysis: {str(e)}")
             return None
-    
+
     def analyze_sentiment_only(self, texts: Union[str, List[str]]) -> Dict[str, Any]:
         """
-        独立的情感分析工具
-        
+        Independent sentiment analysis tool
+
         Args:
-            texts: 单个文本或文本列表
-            
+            texts: Single text or list of texts
+
         Returns:
-            情感分析结果
+            Sentiment analysis results
         """
-        logger.info(f"  → 执行独立情感分析")
+        logger.info(f"  → Executing independent sentiment analysis")
         
         try:
-            # 初始化情感分析器（如果尚未初始化且未被禁用）
+            # Initialize sentiment analyzer (if not yet initialized and not disabled)
             if not self.sentiment_analyzer.is_initialized and not self.sentiment_analyzer.is_disabled:
-                logger.info("    初始化情感分析模型...")
+                logger.info("    Initializing sentiment analysis model...")
                 if not self.sentiment_analyzer.initialize():
-                    logger.info("     情感分析模型初始化失败，将直接透传原始文本")
+                    logger.info("     Sentiment analysis model initialization failed, will pass through original text")
             elif self.sentiment_analyzer.is_disabled:
-                logger.warning("     情感分析功能已禁用，直接透传原始文本")
-            
-            # 执行分析
+                logger.warning("     Sentiment analysis feature disabled, passing through original text")
+
+            # Perform analysis
             if isinstance(texts, str):
                 result = self.sentiment_analyzer.analyze_single_text(texts)
                 result_dict = result.__dict__
@@ -339,7 +339,7 @@ class DeepSearchAgent:
                 }
                 if not result.analysis_performed:
                     response["success"] = False
-                    response["warning"] = result.error_message or "情感分析功能不可用，已直接返回原始文本"
+                    response["warning"] = result.error_message or "Sentiment analysis not available, returning original text"
                 return response
             else:
                 texts_list = list(texts)
@@ -355,112 +355,112 @@ class DeepSearchAgent:
                 if not batch_result.analysis_performed:
                     warning = next(
                         (r.error_message for r in batch_result.results if r.error_message),
-                        "情感分析功能不可用，已直接返回原始文本"
+                        "Sentiment analysis not available, returning original text"
                     )
                     response["success"] = False
                     response["warning"] = warning
                 return response
-                
+
         except Exception as e:
-            logger.exception(f"    ❌ 情感分析过程中发生错误: {str(e)}")
+            logger.exception(f"    Error during sentiment analysis: {str(e)}")
             return {
                 "success": False,
                 "error": str(e),
                 "results": []
             }
-    
+
     def research(self, query: str, save_report: bool = True) -> str:
         """
-        执行深度研究
-        
+        Execute deep research
+
         Args:
-            query: 研究查询
-            save_report: 是否保存报告到文件
-            
+            query: Research query
+            save_report: Whether to save report to file
+
         Returns:
-            最终报告内容
+            Final report content
         """
         logger.info(f"\n{'='*60}")
-        logger.info(f"开始深度研究: {query}")
+        logger.info(f"Starting deep research: {query}")
         logger.info(f"{'='*60}")
-        
+
         try:
-            # Step 1: 生成报告结构
+            # Step 1: Generate report structure
             self._generate_report_structure(query)
-            
-            # Step 2: 处理每个段落
+
+            # Step 2: Process each paragraph
             self._process_paragraphs()
-            
-            # Step 3: 生成最终报告
+
+            # Step 3: Generate final report
             final_report = self._generate_final_report()
-            
-            # Step 4: 保存报告
+
+            # Step 4: Save report
             if save_report:
                 self._save_report(final_report)
 
-            logger.info("深度研究完成！")
-            
+            logger.info("Deep research completed!")
+
             return final_report
-            
+
         except Exception as e:
-            logger.exception(f"研究过程中发生错误: {str(e)}")
+            logger.exception(f"Error during research: {str(e)}")
             raise e
     
     def _generate_report_structure(self, query: str):
-        """生成报告结构"""
-        logger.info(f"\n[步骤 1] 生成报告结构...")
-        
-        # 创建报告结构节点
+        """Generate report structure"""
+        logger.info(f"\n[Step 1] Generating report structure...")
+
+        # Create report structure node
         report_structure_node = ReportStructureNode(self.llm_client, query)
-        
-        # 生成结构并更新状态
+
+        # Generate structure and update state
         self.state = report_structure_node.mutate_state(state=self.state)
-        
-        _message = f"报告结构已生成，共 {len(self.state.paragraphs)} 个段落:"
+
+        _message = f"Report structure generated, {len(self.state.paragraphs)} paragraphs total:"
         for i, paragraph in enumerate(self.state.paragraphs, 1):
             _message += f"\n  {i}. {paragraph.title}"
         logger.info(_message)
-    
+
     def _process_paragraphs(self):
-        """处理所有段落"""
+        """Process all paragraphs"""
         total_paragraphs = len(self.state.paragraphs)
-        
+
         for i in range(total_paragraphs):
-            logger.info(f"\n[步骤 2.{i+1}] 处理段落: {self.state.paragraphs[i].title}")
+            logger.info(f"\n[Step 2.{i+1}] Processing paragraph: {self.state.paragraphs[i].title}")
             logger.info("-" * 50)
-            
-            # 初始搜索和总结
+
+            # Initial search and summary
             self._initial_search_and_summary(i)
-            
-            # 反思循环
+
+            # Reflection loop
             self._reflection_loop(i)
-            
-            # 标记段落完成
+
+            # Mark paragraph completed
             self.state.paragraphs[i].research.mark_completed()
-            
+
             progress = (i + 1) / total_paragraphs * 100
-            logger.info(f"段落处理完成 ({progress:.1f}%)")
-    
+            logger.info(f"Paragraph processing completed ({progress:.1f}%)")
+
     def _initial_search_and_summary(self, paragraph_index: int):
-        """执行初始搜索和总结"""
+        """Execute initial search and summary"""
         paragraph = self.state.paragraphs[paragraph_index]
-        
-        # 准备搜索输入
+
+        # Prepare search input
         search_input = {
             "title": paragraph.title,
             "content": paragraph.content
         }
-        
-        # 生成搜索查询和工具选择
-        logger.info("  - 生成搜索查询...")
+
+        # Generate search query and tool selection
+        logger.info("  - Generating search query...")
         search_output = self.first_search_node.run(search_input)
         search_query = search_output["search_query"]
-        search_tool = search_output.get("search_tool", "search_topic_globally")  # 默认工具
+        search_tool = search_output.get("search_tool", "search_topic_globally")  # Default tool
         reasoning = search_output["reasoning"]
-        
-        logger.info(f"  - 搜索查询: {search_query}")
-        logger.info(f"  - 选择的工具: {search_tool}")
-        logger.info(f"  - 推理: {reasoning}")
+
+        logger.info(f"  - Search query: {search_query}")
+        logger.info(f"  - Selected tool: {search_tool}")
+        logger.info(f"  - Reasoning: {reasoning}")
         
         # 执行搜索
         logger.info("  - 执行数据库查询...")

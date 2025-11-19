@@ -26,7 +26,7 @@ class FirstSearchNode(BaseNode):
         初始化首次搜索节点
         
         Args:
-            llm_client: LLM客户端
+            llm_client: LLM client
         """
         super().__init__(llm_client, "FirstSearchNode")
     
@@ -159,7 +159,7 @@ class ReflectionNode(BaseNode):
         初始化反思节点
         
         Args:
-            llm_client: LLM客户端
+            llm_client: LLM client
         """
         super().__init__(llm_client, "ReflectionNode")
     

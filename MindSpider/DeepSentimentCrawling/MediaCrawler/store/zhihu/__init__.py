@@ -1,12 +1,12 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：  
 # 1. 不得用于任何商业用途。  
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。  
-# 3. 不得进行大规模爬取或对平台造成运营干扰。  
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。   
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。  
+# 3. 不得进行大规模crawl或对platform造成运营干扰。  
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。   
 # 5. 不得用于任何非法或不当的用途。
 #   
 # 详细许可条款请参阅项目根目录下的LICENSE文件。  
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。  
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。  
 
 
 # -*- coding: utf-8 -*-
@@ -41,7 +41,7 @@ class ZhihuStoreFactory:
 
 async def batch_update_zhihu_contents(contents: List[ZhihuContent]):
     """
-    批量更新知乎内容
+    批量updateZhihucontent
     Args:
         contents:
 
@@ -56,7 +56,7 @@ async def batch_update_zhihu_contents(contents: List[ZhihuContent]):
 
 async def update_zhihu_content(content_item: ZhihuContent):
     """
-    更新知乎内容
+    updateZhihucontent
     Args:
         content_item:
 
@@ -73,7 +73,7 @@ async def update_zhihu_content(content_item: ZhihuContent):
 
 async def batch_update_zhihu_note_comments(comments: List[ZhihuComment]):
     """
-    批量更新知乎内容评论
+    批量updateZhihucontentcomment
     Args:
         comments:
 
@@ -89,7 +89,7 @@ async def batch_update_zhihu_note_comments(comments: List[ZhihuComment]):
 
 async def update_zhihu_content_comment(comment_item: ZhihuComment):
     """
-    更新知乎内容评论
+    updateZhihucontentcomment
     Args:
         comment_item:
 
@@ -104,7 +104,7 @@ async def update_zhihu_content_comment(comment_item: ZhihuComment):
 
 async def save_creator(creator: ZhihuCreator):
     """
-    保存知乎创作者信息
+    saveZhihu创作者信息
     Args:
         creator:
 

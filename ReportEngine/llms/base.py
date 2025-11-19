@@ -78,15 +78,15 @@ class LLMClient:
 
     def stream_invoke(self, system_prompt: str, user_prompt: str, **kwargs) -> Generator[str, None, None]:
         """
-        流式调用LLM，逐步返回响应内容
-        
+        Stream invoke LLM, gradually returning response content
+
         Args:
-            system_prompt: 系统提示词
-            user_prompt: 用户提示词
-            **kwargs: 额外参数（temperature, top_p等）
-            
+            system_prompt: System prompt
+            user_prompt: User prompt
+            **kwargs: Additional parameters (temperature, top_p, etc.)
+
         Yields:
-            响应文本块（str）
+            Response text chunks (str)
         """
         messages = [
             {"role": "system", "content": system_prompt},
@@ -95,7 +95,7 @@ class LLMClient:
 
         allowed_keys = {"temperature", "top_p", "presence_penalty", "frequency_penalty"}
         extra_params = {key: value for key, value in kwargs.items() if key in allowed_keys and value is not None}
-        # 强制使用流式
+        # Force streaming
         extra_params["stream"] = True
 
         timeout = kwargs.pop("timeout", self.timeout)
@@ -107,35 +107,35 @@ class LLMClient:
                 timeout=timeout,
                 **extra_params,
             )
-            
+
             for chunk in stream:
                 if chunk.choices and len(chunk.choices) > 0:
                     delta = chunk.choices[0].delta
                     if delta and delta.content:
                         yield delta.content
         except Exception as e:
-            logger.error(f"流式请求失败: {str(e)}")
+            logger.error(f"Streaming request failed: {str(e)}")
             raise e
-    
+
     @with_retry(LLM_RETRY_CONFIG)
     def stream_invoke_to_string(self, system_prompt: str, user_prompt: str, **kwargs) -> str:
         """
-        流式调用LLM并安全地拼接为完整字符串（避免UTF-8多字节字符截断）
-        
+        Stream invoke LLM and safely concatenate to complete string (avoids UTF-8 multi-byte character truncation)
+
         Args:
-            system_prompt: 系统提示词
-            user_prompt: 用户提示词
-            **kwargs: 额外参数（temperature, top_p等）
-            
+            system_prompt: System prompt
+            user_prompt: User prompt
+            **kwargs: Additional parameters (temperature, top_p, etc.)
+
         Returns:
-            完整的响应字符串
+            Complete response string
         """
-        # 以字节形式收集所有块
+        # Collect all chunks in byte form
         byte_chunks = []
         for chunk in self.stream_invoke(system_prompt, user_prompt, **kwargs):
             byte_chunks.append(chunk.encode('utf-8'))
-        
-        # 拼接所有字节，然后一次性解码
+
+        # Concatenate all bytes, then decode at once
         if byte_chunks:
             return b''.join(byte_chunks).decode('utf-8', errors='replace')
         return ""

@@ -1,12 +1,12 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：
 # 1. 不得用于任何商业用途。
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。
-# 3. 不得进行大规模爬取或对平台造成运营干扰。
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。
+# 3. 不得进行大规模crawl或对platform造成运营干扰。
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。
 # 5. 不得用于任何非法或不当的用途。
 #
 # 详细许可条款请参阅项目根目录下的LICENSE文件。
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。
 
 
 import asyncio
@@ -70,7 +70,7 @@ class TieBaCrawler(AbstractCrawler):
             )
 
         async with async_playwright() as playwright:
-            # 根据配置选择启动模式
+            # 根据configuration选择启动模式
             if config.ENABLE_CDP_MODE:
                 utils.logger.info("[BaiduTieBaCrawler] 使用CDP模式启动浏览器")
                 self.browser_context = await self.launch_browser_with_cdp(
@@ -95,7 +95,7 @@ class TieBaCrawler(AbstractCrawler):
 
             self.context_page = await self.browser_context.new_page()
 
-            # 先访问百度首页,再点击贴吧链接,避免触发安全验证
+            # 先访问百度首页,再点击Tieba链接,避免触发安全验证
             await self._navigate_to_tieba_via_baidu()
 
             # Create a client to interact with the baidutieba website.
@@ -390,34 +390,34 @@ class TieBaCrawler(AbstractCrawler):
 
     async def _navigate_to_tieba_via_baidu(self):
         """
-        模拟真实用户访问路径:
+        模拟真实user访问路径:
         1. 先访问百度首页 (https://www.baidu.com/)
         2. 等待页面加载
-        3. 点击顶部导航栏的"贴吧"链接
-        4. 跳转到贴吧首页
+        3. 点击顶部导航栏的"Tieba"链接
+        4. 跳转到Tieba首页
 
         这样做可以避免触发百度的安全验证
         """
-        utils.logger.info("[TieBaCrawler] 模拟真实用户访问路径...")
+        utils.logger.info("[TieBaCrawler] 模拟真实user访问路径...")
 
         try:
             # Step 1: 访问百度首页
             utils.logger.info("[TieBaCrawler] Step 1: 访问百度首页 https://www.baidu.com/")
             await self.context_page.goto("https://www.baidu.com/", wait_until="domcontentloaded")
 
-            # Step 2: 等待页面加载,使用配置文件中的延时设置
-            utils.logger.info(f"[TieBaCrawler] Step 2: 等待 {config.CRAWLER_MAX_SLEEP_SEC}秒 模拟用户浏览...")
+            # Step 2: 等待页面加载,使用configuration文件中的延时设置
+            utils.logger.info(f"[TieBaCrawler] Step 2: 等待 {config.CRAWLER_MAX_SLEEP_SEC}秒 模拟user浏览...")
             await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
 
-            # Step 3: 查找并点击"贴吧"链接
-            utils.logger.info("[TieBaCrawler] Step 3: 查找并点击'贴吧'链接...")
+            # Step 3: 查找并点击"Tieba"链接
+            utils.logger.info("[TieBaCrawler] Step 3: 查找并点击'Tieba'链接...")
 
-            # 尝试多种选择器,确保能找到贴吧链接
+            # 尝试多种选择器,确保能找到Tieba链接
             tieba_selectors = [
                 'a[href="http://tieba.baidu.com/"]',
                 'a[href="https://tieba.baidu.com/"]',
-                'a.mnav:has-text("贴吧")',
-                'text=贴吧',
+                'a.mnav:has-text("Tieba")',
+                'text=Tieba',
             ]
 
             tieba_link = None
@@ -425,62 +425,62 @@ class TieBaCrawler(AbstractCrawler):
                 try:
                     tieba_link = await self.context_page.wait_for_selector(selector, timeout=5000)
                     if tieba_link:
-                        utils.logger.info(f"[TieBaCrawler] 找到贴吧链接 (selector: {selector})")
+                        utils.logger.info(f"[TieBaCrawler] 找到Tieba链接 (selector: {selector})")
                         break
                 except Exception:
                     continue
 
             if not tieba_link:
-                utils.logger.warning("[TieBaCrawler] 未找到贴吧链接,直接访问贴吧首页")
+                utils.logger.warning("[TieBaCrawler] 未找到Tieba链接,直接访问Tieba首页")
                 await self.context_page.goto(self.index_url, wait_until="domcontentloaded")
                 return
 
-            # Step 4: 点击贴吧链接 (检查是否会打开新标签页)
-            utils.logger.info("[TieBaCrawler] Step 4: 点击贴吧链接...")
+            # Step 4: 点击Tieba链接 (check是否会打开新标签页)
+            utils.logger.info("[TieBaCrawler] Step 4: 点击Tieba链接...")
 
-            # 检查链接的target属性
+            # check链接的target属性
             target_attr = await tieba_link.get_attribute("target")
             utils.logger.info(f"[TieBaCrawler] 链接target属性: {target_attr}")
 
             if target_attr == "_blank":
-                # 如果是新标签页,需要等待新页面并切换
+                # 如果是新标签页,need等待新页面并切换
                 utils.logger.info("[TieBaCrawler] 链接会在新标签页打开,等待新页面...")
 
                 async with self.browser_context.expect_page() as new_page_info:
                     await tieba_link.click()
 
-                # 获取新打开的页面
+                # get新打开的页面
                 new_page = await new_page_info.value
                 await new_page.wait_for_load_state("domcontentloaded")
 
                 # 关闭旧的百度首页
                 await self.context_page.close()
 
-                # 切换到新的贴吧页面
+                # 切换到新的Tieba页面
                 self.context_page = new_page
-                utils.logger.info("[TieBaCrawler] ✅ 已切换到新标签页 (贴吧页面)")
+                utils.logger.info("[TieBaCrawler] ✅ 已切换到新标签页 (Tieba页面)")
             else:
-                # 如果是同一标签页跳转,正常等待导航
+                # 如果是同一标签页跳转,normal等待导航
                 utils.logger.info("[TieBaCrawler] 链接在当前标签页跳转...")
                 async with self.context_page.expect_navigation(wait_until="domcontentloaded"):
                     await tieba_link.click()
 
-            # Step 5: 等待页面稳定,使用配置文件中的延时设置
-            utils.logger.info(f"[TieBaCrawler] Step 5: 页面加载完成,等待 {config.CRAWLER_MAX_SLEEP_SEC}秒...")
+            # Step 5: 等待页面稳定,使用configuration文件中的延时设置
+            utils.logger.info(f"[TieBaCrawler] Step 5: 页面加载completed,等待 {config.CRAWLER_MAX_SLEEP_SEC}秒...")
             await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
 
             current_url = self.context_page.url
-            utils.logger.info(f"[TieBaCrawler] ✅ 成功通过百度首页进入贴吧! 当前URL: {current_url}")
+            utils.logger.info(f"[TieBaCrawler] ✅ success通过百度首页进入Tieba! 当前URL: {current_url}")
 
         except Exception as e:
-            utils.logger.error(f"[TieBaCrawler] 通过百度首页访问贴吧失败: {e}")
-            utils.logger.info("[TieBaCrawler] 回退:直接访问贴吧首页")
+            utils.logger.error(f"[TieBaCrawler] 通过百度首页访问Tiebafailed: {e}")
+            utils.logger.info("[TieBaCrawler] 回退:直接访问Tieba首页")
             await self.context_page.goto(self.index_url, wait_until="domcontentloaded")
 
     async def _inject_anti_detection_scripts(self):
         """
         注入反检测JavaScript脚本
-        针对百度贴吧的特殊检测机制
+        针对百度Tieba的特殊检测机制
         """
         utils.logger.info("[TieBaCrawler] Injecting anti-detection scripts...")
 
@@ -547,7 +547,7 @@ class TieBaCrawler(AbstractCrawler):
         """
         utils.logger.info("[TieBaCrawler.create_tieba_client] Begin create tieba API client...")
 
-        # 从真实浏览器提取User-Agent,避免被检测
+        # 从真实浏览器extractUser-Agent,避免被检测
         user_agent = await self.context_page.evaluate("() => navigator.userAgent")
         utils.logger.info(f"[TieBaCrawler.create_tieba_client] Extracted User-Agent from browser: {user_agent}")
 
@@ -642,14 +642,14 @@ class TieBaCrawler(AbstractCrawler):
                 headless=headless,
             )
 
-            # 显示浏览器信息
+            # show浏览器信息
             browser_info = await self.cdp_manager.get_browser_info()
             utils.logger.info(f"[TieBaCrawler] CDP浏览器信息: {browser_info}")
 
             return browser_context
 
         except Exception as e:
-            utils.logger.error(f"[TieBaCrawler] CDP模式启动失败，回退到标准模式: {e}")
+            utils.logger.error(f"[TieBaCrawler] CDP模式启动failed，回退到标准模式: {e}")
             # 回退到标准模式
             chromium = playwright.chromium
             return await self.launch_browser(
@@ -662,7 +662,7 @@ class TieBaCrawler(AbstractCrawler):
         Returns:
 
         """
-        # 如果使用CDP模式，需要特殊处理
+        # 如果使用CDP模式，need特殊处理
         if self.cdp_manager:
             await self.cdp_manager.cleanup()
             self.cdp_manager = None

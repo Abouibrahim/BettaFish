@@ -1,12 +1,12 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：
 # 1. 不得用于任何商业用途。
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。
-# 3. 不得进行大规模爬取或对平台造成运营干扰。
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。
+# 3. 不得进行大规模crawl或对platform造成运营干扰。
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。
 # 5. 不得用于任何非法或不当的用途。
 #
 # 详细许可条款请参阅项目根目录下的LICENSE文件。
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。
 
 # -*- coding: utf-8 -*-
 import asyncio
@@ -51,7 +51,7 @@ class ZhiHuClient(AbstractApiClient):
         """
         请求头参数签名
         Args:
-            url:  请求的URL需要包含请求的参数
+            url:  请求的URLneed包含请求的参数
         Returns:
 
         """
@@ -86,7 +86,7 @@ class ZhiHuClient(AbstractApiClient):
             utils.logger.error(f"[ZhiHuClient.request] Requset Url: {url}, Request error: {response.text}")
             if response.status_code == 403:
                 raise ForbiddenError(response.text)
-            elif response.status_code == 404:  # 如果一个content没有评论也是404
+            elif response.status_code == 404:  # 如果一个content没有comment也是404
                 return {}
 
             raise DataFetchError(response.text)
@@ -122,7 +122,7 @@ class ZhiHuClient(AbstractApiClient):
 
     async def pong(self) -> bool:
         """
-        用于检查登录态是否失效了
+        用于check登录态是否失效了
         Returns:
 
         """
@@ -142,7 +142,7 @@ class ZhiHuClient(AbstractApiClient):
 
     async def update_cookies(self, browser_context: BrowserContext):
         """
-        API客户端提供的更新cookies方法，一般情况下登录成功后会调用此方法
+        API客户端提供的updatecookies方法，一般情况下登录success后会调用此方法
         Args:
             browser_context: 浏览器上下文对象
 
@@ -155,7 +155,7 @@ class ZhiHuClient(AbstractApiClient):
 
     async def get_current_user_info(self) -> Dict:
         """
-        获取当前登录用户信息
+        get当前登录user信息
         Returns:
 
         """
@@ -172,9 +172,9 @@ class ZhiHuClient(AbstractApiClient):
         search_time: SearchTime = SearchTime.DEFAULT,
     ) -> List[ZhihuContent]:
         """
-        根据关键词搜索
+        根据keyword搜索
         Args:
-            keyword: 关键词
+            keyword: keyword
             page: 第几页
             page_size: 分页size
             sort: 排序
@@ -213,10 +213,10 @@ class ZhiHuClient(AbstractApiClient):
         order_by: str = "score",
     ) -> Dict:
         """
-        获取内容的一级评论
+        getcontent的一级comment
         Args:
-            content_id: 内容ID
-            content_type: 内容类型(answer, article, zvideo)
+            content_id: contentID
+            content_type: content类型(answer, article, zvideo)
             offset:
             limit:
             order_by:
@@ -243,7 +243,7 @@ class ZhiHuClient(AbstractApiClient):
         order_by: str = "sort",
     ) -> Dict:
         """
-        获取一级评论下的子评论
+        get一级comment下的子comment
         Args:
             root_comment_id:
             offset:
@@ -268,11 +268,11 @@ class ZhiHuClient(AbstractApiClient):
         callback: Optional[Callable] = None,
     ) -> List[ZhihuComment]:
         """
-        获取指定帖子下的所有一级评论，该方法会一直查找一个帖子下的所有评论信息
+        get指定帖子下的all一级comment，该方法会一直查找一个帖子下的allcomment信息
         Args:
-            content: 内容详情对象(问题｜文章｜视频)
-            crawl_interval: 爬取一次笔记的延迟单位（秒）
-            callback: 一次笔记爬取结束后
+            content: content详情对象(问题｜文章｜视频)
+            crawl_interval: crawl一次笔记的延迟单位（秒）
+            callback: 一次笔记crawl结束后
 
         Returns:
 
@@ -309,12 +309,12 @@ class ZhiHuClient(AbstractApiClient):
         callback: Optional[Callable] = None,
     ) -> List[ZhihuComment]:
         """
-        获取指定评论下的所有子评论
+        get指定comment下的all子comment
         Args:
-            content: 内容详情对象(问题｜文章｜视频)
-            comments: 评论列表
-            crawl_interval: 爬取一次笔记的延迟单位（秒）
-            callback: 一次笔记爬取结束后
+            content: content详情对象(问题｜文章｜视频)
+            comments: comment列table
+            crawl_interval: crawl一次笔记的延迟单位（秒）
+            callback: 一次笔记crawl结束后
 
         Returns:
 
@@ -351,7 +351,7 @@ class ZhiHuClient(AbstractApiClient):
 
     async def get_creator_info(self, url_token: str) -> Optional[ZhihuCreator]:
         """
-        获取创作者信息
+        get创作者信息
         Args:
             url_token:
 
@@ -364,7 +364,7 @@ class ZhiHuClient(AbstractApiClient):
 
     async def get_creator_answers(self, url_token: str, offset: int = 0, limit: int = 20) -> Dict:
         """
-        获取创作者的回答
+        get创作者的回答
         Args:
             url_token:
             offset:
@@ -386,7 +386,7 @@ class ZhiHuClient(AbstractApiClient):
 
     async def get_creator_articles(self, url_token: str, offset: int = 0, limit: int = 20) -> Dict:
         """
-        获取创作者的文章
+        get创作者的文章
         Args:
             url_token:
             offset:
@@ -407,7 +407,7 @@ class ZhiHuClient(AbstractApiClient):
 
     async def get_creator_videos(self, url_token: str, offset: int = 0, limit: int = 20) -> Dict:
         """
-        获取创作者的视频
+        get创作者的视频
         Args:
             url_token:
             offset:
@@ -427,11 +427,11 @@ class ZhiHuClient(AbstractApiClient):
 
     async def get_all_anwser_by_creator(self, creator: ZhihuCreator, crawl_interval: float = 1.0, callback: Optional[Callable] = None) -> List[ZhihuContent]:
         """
-        获取创作者的所有回答
+        get创作者的all回答
         Args:
             creator: 创作者信息
-            crawl_interval: 爬取一次笔记的延迟单位（秒）
-            callback: 一次笔记爬取结束后
+            crawl_interval: crawl一次笔记的延迟单位（秒）
+            callback: 一次笔记crawl结束后
 
         Returns:
 
@@ -462,7 +462,7 @@ class ZhiHuClient(AbstractApiClient):
         callback: Optional[Callable] = None,
     ) -> List[ZhihuContent]:
         """
-        获取创作者的所有文章
+        get创作者的all文章
         Args:
             creator:
             crawl_interval:
@@ -496,7 +496,7 @@ class ZhiHuClient(AbstractApiClient):
         callback: Optional[Callable] = None,
     ) -> List[ZhihuContent]:
         """
-        获取创作者的所有视频
+        get创作者的all视频
         Args:
             creator:
             crawl_interval:
@@ -529,7 +529,7 @@ class ZhiHuClient(AbstractApiClient):
         answer_id: str,
     ) -> Optional[ZhihuContent]:
         """
-        获取回答信息
+        get回答信息
         Args:
             question_id:
             answer_id:
@@ -543,7 +543,7 @@ class ZhiHuClient(AbstractApiClient):
 
     async def get_article_info(self, article_id: str) -> Optional[ZhihuContent]:
         """
-        获取文章信息
+        get文章信息
         Args:
             article_id:
 
@@ -556,7 +556,7 @@ class ZhiHuClient(AbstractApiClient):
 
     async def get_video_info(self, video_id: str) -> Optional[ZhihuContent]:
         """
-        获取视频信息
+        get视频信息
         Args:
             video_id:
 

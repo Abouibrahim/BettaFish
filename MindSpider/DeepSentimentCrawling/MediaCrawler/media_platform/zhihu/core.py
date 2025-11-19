@@ -1,12 +1,12 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：
 # 1. 不得用于任何商业用途。
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。
-# 3. 不得进行大规模爬取或对平台造成运营干扰。
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。
+# 3. 不得进行大规模crawl或对platform造成运营干扰。
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。
 # 5. 不得用于任何非法或不当的用途。
 #
 # 详细许可条款请参阅项目根目录下的LICENSE文件。
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。
 
 
 # -*- coding: utf-8 -*-
@@ -70,7 +70,7 @@ class ZhihuCrawler(AbstractCrawler):
             )
 
         async with async_playwright() as playwright:
-            # 根据配置选择启动模式
+            # 根据configuration选择启动模式
             if config.ENABLE_CDP_MODE:
                 utils.logger.info("[ZhihuCrawler] 使用CDP模式启动浏览器")
                 self.browser_context = await self.launch_browser_with_cdp(
@@ -107,9 +107,9 @@ class ZhihuCrawler(AbstractCrawler):
                     browser_context=self.browser_context
                 )
 
-            # 知乎的搜索接口需要打开搜索页面之后cookies才能访问API，单独的首页不行
+            # Zhihu的搜索接口need打开搜索页面之后cookies才能访问API，单独的首页不行
             utils.logger.info(
-                "[ZhihuCrawler.start] Zhihu跳转到搜索页面获取搜索页面的Cookies，该过程需要5秒左右"
+                "[ZhihuCrawler.start] Zhihu跳转到搜索页面get搜索页面的Cookies，该过程need5秒左右"
             )
             await self.context_page.goto(
                 f"{self.index_url}/search?q=python&search_source=Guess&utm_content=search_hot&type=content"
@@ -263,7 +263,7 @@ class ZhihuCrawler(AbstractCrawler):
             )
             await zhihu_store.save_creator(creator=createor_info)
 
-            # 默认只提取回答信息，如果需要文章和视频，把下面的注释打开即可
+            # default只extract回答信息，如果need文章和视频，把下面的注释打开即可
 
             # Get all anwser information of the creator
             all_content_list = await self.zhihu_client.get_all_anwser_by_creator(
@@ -457,14 +457,14 @@ class ZhihuCrawler(AbstractCrawler):
                 headless=headless,
             )
 
-            # 显示浏览器信息
+            # show浏览器信息
             browser_info = await self.cdp_manager.get_browser_info()
             utils.logger.info(f"[ZhihuCrawler] CDP浏览器信息: {browser_info}")
 
             return browser_context
 
         except Exception as e:
-            utils.logger.error(f"[ZhihuCrawler] CDP模式启动失败，回退到标准模式: {e}")
+            utils.logger.error(f"[ZhihuCrawler] CDP模式启动failed，回退到标准模式: {e}")
             # 回退到标准模式
             chromium = playwright.chromium
             return await self.launch_browser(
@@ -473,7 +473,7 @@ class ZhihuCrawler(AbstractCrawler):
 
     async def close(self):
         """Close browser context"""
-        # 如果使用CDP模式，需要特殊处理
+        # 如果使用CDP模式，need特殊处理
         if self.cdp_manager:
             await self.cdp_manager.cleanup()
             self.cdp_manager = None

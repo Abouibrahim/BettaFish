@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-统一的情感分析预测程序
-支持加载所有模型进行情感预测
+Unified sentiment analysis prediction program
+Supports loading all models for sentiment prediction
 """
 import argparse
 import os
@@ -10,7 +10,7 @@ from typing import Dict, Tuple, List
 import warnings
 warnings.filterwarnings("ignore")
 
-# 导入所有模型类
+# Import all model classes
 from bayes_train import BayesModel
 from svm_train import SVMModel
 from xgboost_train import XGBoostModel
@@ -20,7 +20,7 @@ from utils import processing
 
 
 class SentimentPredictor:
-    """情感分析预测器"""
+    """Sentiment analysis predictor"""
     
     def __init__(self):
         self.models = {}
@@ -33,36 +33,36 @@ class SentimentPredictor:
         }
         
     def load_model(self, model_type: str, model_path: str, **kwargs) -> None:
-        """加载指定类型的模型
-        
+        """Load specified type of model
+
         Args:
-            model_type: 模型类型 ('bayes', 'svm', 'xgboost', 'lstm', 'bert')
-            model_path: 模型文件路径
-            **kwargs: 其他参数（如BERT的预训练模型路径）
+            model_type: Model type ('bayes', 'svm', 'xgboost', 'lstm', 'bert')
+            model_path: Model file path
+            **kwargs: Other parameters (such as BERT pretrained model path)
         """
         if model_type not in self.available_models:
-            raise ValueError(f"不支持的模型类型: {model_type}")
-        
+            raise ValueError(f"Unsupported model type: {model_type}")
+
         if not os.path.exists(model_path):
-            print(f"警告: 模型文件不存在: {model_path}")
+            print(f"Warning: Model file does not exist: {model_path}")
             return
-        
-        print(f"加载 {model_type.upper()} 模型...")
-        
+
+        print(f"Loading {model_type.upper()} model...")
+
         try:
             if model_type == 'bert':
-                # BERT需要额外的预训练模型路径
+                # BERT requires additional pretrained model path
                 bert_path = kwargs.get('bert_path', './model/chinese_wwm_pytorch')
                 model = BertModel_Custom(bert_path)
             else:
                 model = self.available_models[model_type]()
-            
+
             model.load_model(model_path)
             self.models[model_type] = model
-            print(f"{model_type.upper()} 模型加载成功")
-            
+            print(f"{model_type.upper()} model loaded successfully")
+
         except Exception as e:
-            print(f"加载 {model_type.upper()} 模型失败: {e}")
+            print(f"Failed to load {model_type.upper()} model: {e}")
     
     def load_all_models(self, model_dir: str = './model', bert_path: str = './model/chinese_wwm_pytorch') -> None:
         """加载所有可用的模型
@@ -252,29 +252,29 @@ class SentimentPredictor:
 
 
 def main():
-    """主函数"""
-    parser = argparse.ArgumentParser(description='微博情感分析统一预测程序')
+    """Main function"""
+    parser = argparse.ArgumentParser(description='Weibo Sentiment Analysis Unified Prediction Program')
     parser.add_argument('--model_dir', type=str, default='./model',
-                        help='模型文件目录')
+                        help='Model file directory')
     parser.add_argument('--bert_path', type=str, default='./model/chinese_wwm_pytorch',
-                        help='BERT预训练模型路径')
+                        help='BERT pretrained model path')
     parser.add_argument('--model_type', type=str, choices=['bayes', 'svm', 'xgboost', 'lstm', 'bert'],
-                        help='指定单个模型类型进行预测')
+                        help='Specify single model type for prediction')
     parser.add_argument('--text', type=str,
-                        help='直接预测指定文本')
+                        help='Directly predict specified text')
     parser.add_argument('--interactive', action='store_true', default=True,
-                        help='交互式预测模式（默认）')
+                        help='Interactive prediction mode (default)')
     parser.add_argument('--ensemble', action='store_true',
-                        help='使用集成预测')
-    
+                        help='Use ensemble prediction')
+
     args = parser.parse_args()
-    
-    # 创建预测器
+
+    # Create predictor
     predictor = SentimentPredictor()
-    
-    # 加载模型
+
+    # Load models
     if args.model_type:
-        # 加载指定模型
+        # Load specified model
         model_files = {
             'bayes': 'bayes_model.pkl',
             'svm': 'svm_model.pkl',
@@ -285,24 +285,24 @@ def main():
         model_path = os.path.join(args.model_dir, model_files[args.model_type])
         predictor.load_model(args.model_type, model_path, bert_path=args.bert_path)
     else:
-        # 加载所有模型
+        # Load all models
         predictor.load_all_models(args.model_dir, args.bert_path)
-    
-    # 如果指定了文本，直接预测
+
+    # If text is specified, predict directly
     if args.text:
         if args.ensemble and len(predictor.models) > 1:
             pred, conf = predictor.ensemble_predict(args.text)
-            sentiment = "正面" if pred == 1 else "负面"
-            print(f"文本: {args.text}")
-            print(f"集成预测: {sentiment} (置信度: {conf:.4f})")
+            sentiment = "Positive" if pred == 1 else "Negative"
+            print(f"Text: {args.text}")
+            print(f"Ensemble prediction: {sentiment} (Confidence: {conf:.4f})")
         else:
             results = predictor.predict_single(args.text, args.model_type)
-            print(f"文本: {args.text}")
+            print(f"Text: {args.text}")
             for model_name, (pred, conf) in results.items():
-                sentiment = "正面" if pred == 1 else "负面"
-                print(f"{model_name.upper()}: {sentiment} (置信度: {conf:.4f})")
+                sentiment = "Positive" if pred == 1 else "Negative"
+                print(f"{model_name.upper()}: {sentiment} (Confidence: {conf:.4f})")
     elif args.interactive:
-        # 交互式模式
+        # Interactive mode
         predictor.interactive_predict()
 
 

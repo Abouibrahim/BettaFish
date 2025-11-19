@@ -1,12 +1,12 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：  
 # 1. 不得用于任何商业用途。  
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。  
-# 3. 不得进行大规模爬取或对平台造成运营干扰。  
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。   
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。  
+# 3. 不得进行大规模crawl或对platform造成运营干扰。  
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。   
 # 5. 不得用于任何非法或不当的用途。
 #   
 # 详细许可条款请参阅项目根目录下的LICENSE文件。  
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。  
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。  
 
 
 import ctypes
@@ -294,7 +294,7 @@ def get_trace_id(img_url: str):
 
 def parse_note_info_from_note_url(url: str) -> NoteUrlInfo:
     """
-    从小红书笔记url中解析出笔记信息
+    从Xiaohongshu笔记url中解析出笔记信息
     Args:
         url: "https://www.xiaohongshu.com/explore/66fad51c000000001b0224b8?xsec_token=AB3rO-QopW5sgrJ41GwN01WCXh6yWPxjSoFI9D5JIMgKw=&xsec_source=pc_search"
     Returns:
@@ -309,7 +309,7 @@ def parse_note_info_from_note_url(url: str) -> NoteUrlInfo:
 
 def parse_creator_info_from_url(url: str) -> CreatorUrlInfo:
     """
-    从小红书创作者主页URL中解析出创作者信息
+    从Xiaohongshu创作者主页URL中解析出创作者信息
     支持以下格式:
     1. 完整URL: "https://www.xiaohongshu.com/user/profile/5eb8e1d400000000010075ae?xsec_token=AB1nWBKCo1vE2HEkfoJUOi5B6BE5n7wVrbdpHoWIj5xHw=&xsec_source=pc_feed"
     2. 纯ID: "5eb8e1d400000000010075ae"
@@ -323,24 +323,24 @@ def parse_creator_info_from_url(url: str) -> CreatorUrlInfo:
     if len(url) == 24 and all(c in "0123456789abcdef" for c in url):
         return CreatorUrlInfo(user_id=url, xsec_token="", xsec_source="")
 
-    # 从URL中提取user_id: /user/profile/xxx
+    # 从URL中extractuser_id: /user/profile/xxx
     import re
     user_pattern = r'/user/profile/([^/?]+)'
     match = re.search(user_pattern, url)
     if match:
         user_id = match.group(1)
-        # 提取xsec_token和xsec_source参数
+        # extractxsec_token和xsec_source参数
         params = extract_url_params_to_dict(url)
         xsec_token = params.get("xsec_token", "")
         xsec_source = params.get("xsec_source", "")
         return CreatorUrlInfo(user_id=user_id, xsec_token=xsec_token, xsec_source=xsec_source)
 
-    raise ValueError(f"无法从URL中解析出创作者信息: {url}")
+    raise ValueError(f"unable to从URL中解析出创作者信息: {url}")
 
 
 if __name__ == '__main__':
     _img_url = "https://sns-img-bd.xhscdn.com/7a3abfaf-90c1-a828-5de7-022c80b92aa3"
-    # 获取一个图片地址在多个cdn下的url地址
+    # get一个图片地址在多个cdn下的url地址
     # final_img_urls = get_img_urls_by_trace_id(get_trace_id(_img_url))
     final_img_url = get_img_url_by_trace_id(get_trace_id(_img_url))
     print(final_img_url)
@@ -358,6 +358,6 @@ if __name__ == '__main__':
             print(f"  结果: {result}\n")
         except Exception as e:
             print(f"✗ URL: {url}")
-            print(f"  错误: {e}\n")
+            print(f"  error: {e}\n")
 
 

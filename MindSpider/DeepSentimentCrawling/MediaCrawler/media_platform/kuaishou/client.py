@@ -1,12 +1,12 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：
 # 1. 不得用于任何商业用途。
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。
-# 3. 不得进行大规模爬取或对平台造成运营干扰。
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。
+# 3. 不得进行大规模crawl或对platform造成运营干扰。
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。
 # 5. 不得用于任何非法或不当的用途。
 #
 # 详细许可条款请参阅项目根目录下的LICENSE文件。
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。
 
 
 # -*- coding: utf-8 -*-
@@ -203,7 +203,7 @@ class KuaiShouClient(AbstractApiClient):
             comments = vision_commen_list.get("rootComments", [])
             if len(result) + len(comments) > max_count:
                 comments = comments[: max_count - len(result)]
-            if callback:  # 如果有回调函数，就执行回调函数
+            if callback:  # 如果有回调函数，就execute回调函数
                 await callback(photo_id, comments)
             result.extend(comments)
             await asyncio.sleep(crawl_interval)
@@ -221,12 +221,12 @@ class KuaiShouClient(AbstractApiClient):
         callback: Optional[Callable] = None,
     ) -> List[Dict]:
         """
-        获取指定一级评论下的所有二级评论, 该方法会一直查找一级评论下的所有二级评论信息
+        get指定一级comment下的all二级comment, 该方法会一直查找一级comment下的all二级comment信息
         Args:
-            comments: 评论列表
+            comments: comment列table
             photo_id: 视频id
-            crawl_interval: 爬取一次评论的延迟单位（秒）
-            callback: 一次评论爬取结束后
+            crawl_interval: crawl一次comment的延迟单位（秒）
+            callback: 一次commentcrawl结束后
         Returns:
 
         """
@@ -266,7 +266,7 @@ class KuaiShouClient(AbstractApiClient):
     async def get_creator_info(self, user_id: str) -> Dict:
         """
         eg: https://www.kuaishou.com/profile/3x4jtnbfter525a
-        快手用户主页
+        Kuaishouuser主页
         """
 
         visionProfile = await self.get_creator_profile(user_id)
@@ -279,11 +279,11 @@ class KuaiShouClient(AbstractApiClient):
         callback: Optional[Callable] = None,
     ) -> List[Dict]:
         """
-        获取指定用户下的所有发过的帖子，该方法会一直查找一个用户下的所有帖子信息
+        get指定user下的all发过的帖子，该方法会一直查找一个user下的all帖子信息
         Args:
-            user_id: 用户ID
-            crawl_interval: 爬取一次的延迟单位（秒）
-            callback: 一次分页爬取结束后的更新回调函数
+            user_id: userID
+            crawl_interval: crawl一次的延迟单位（秒）
+            callback: 一次分页crawl结束后的update回调函数
         Returns:
 
         """

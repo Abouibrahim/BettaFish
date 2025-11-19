@@ -1,9 +1,9 @@
 """
-舆情大数据聚合主表ORM模型（自动由原tables.sql结构同步生成，对应大表批量搜索与内容入库）
+舆情大data聚合主tableORM模型（自动由原tables.sql结构同步生成，对应大table批量搜索与content入库）
 
-数据模型定义位置：
-- MindSpider/DeepSentimentCrawling/MediaCrawler/schema/tables.sql  # 主表结构来源文件
-- 本模块（自动映射SQL表，适配MySQL/PostgreSQL，推荐手动完善注释、唯一/索引补充）
+data模型定义位置：
+- MindSpider/DeepSentimentCrawling/MediaCrawler/schema/tables.sql  # 主table结构来源文件
+- 本模块（自动映射SQLtable，适配MySQL/PostgreSQL，推荐手动完善注释、唯一/索引补充）
 - MindSpider/schema/models_sa.py  # Base 定义来源
 
 本模块以MindSpider\DeepSentimentCrawling\MediaCrawler\database\models.py为准
@@ -12,7 +12,7 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Integer, String, BigInteger, Text, ForeignKey
 
-# 使用 models_sa 中的 Base，确保所有表在同一个 metadata 中，外键引用可以正常工作
+# 使用 models_sa 中的 Base，确保alltable在同一个 metadata 中，外键引用可以normal工作
 from models_sa import Base
 
 class BilibiliVideo(Base):

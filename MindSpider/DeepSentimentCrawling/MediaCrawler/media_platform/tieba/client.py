@@ -1,12 +1,12 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：
 # 1. 不得用于任何商业用途。
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。
-# 3. 不得进行大规模爬取或对平台造成运营干扰。
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。
+# 3. 不得进行大规模crawl或对platform造成运营干扰。
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。
 # 5. 不得用于任何非法或不当的用途。
 #
 # 详细许可条款请参阅项目根目录下的LICENSE文件。
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。
 
 import asyncio
 import json
@@ -39,7 +39,7 @@ class BaiduTieBaClient(AbstractApiClient):
     ):
         self.ip_pool: Optional[ProxyIpPool] = ip_pool
         self.timeout = timeout
-        # 使用传入的headers(包含真实浏览器UA)或默认headers
+        # 使用传入的headers(包含真实浏览器UA)或defaultheaders
         self.headers = headers or {
             "User-Agent": utils.get_user_agent(),
             "Cookie": "",
@@ -87,7 +87,7 @@ class BaiduTieBaClient(AbstractApiClient):
         Args:
             method: 请求方法
             url: 请求的URL
-            return_ori_content: 是否返回原始内容
+            return_ori_content: 是否返回原始content
             proxy: 代理IP
             **kwargs: 其他请求参数，例如请求头、请求体等
 
@@ -96,7 +96,7 @@ class BaiduTieBaClient(AbstractApiClient):
         """
         actual_proxy = proxy if proxy else self.default_ip_proxy
 
-        # 在线程池中执行同步的requests请求
+        # 在线程池中execute同步的requests请求
         response = await asyncio.to_thread(
             self._sync_request,
             method,
@@ -125,7 +125,7 @@ class BaiduTieBaClient(AbstractApiClient):
         Args:
             uri: 请求路由
             params: 请求参数
-            return_ori_content: 是否返回原始内容
+            return_ori_content: 是否返回原始content
 
         Returns:
 
@@ -145,8 +145,8 @@ class BaiduTieBaClient(AbstractApiClient):
                 self.default_ip_proxy = proxy
                 return res
 
-            utils.logger.error(f"[BaiduTieBaClient.get] 达到了最大重试次数，IP已经被Block，请尝试更换新的IP代理: {e}")
-            raise Exception(f"[BaiduTieBaClient.get] 达到了最大重试次数，IP已经被Block，请尝试更换新的IP代理: {e}")
+            utils.logger.error(f"[BaiduTieBaClient.get] 达到了maximum重试次数，IP已经被Block，请尝试更换新的IP代理: {e}")
+            raise Exception(f"[BaiduTieBaClient.get] 达到了maximum重试次数，IP已经被Block，请尝试更换新的IP代理: {e}")
 
     async def post(self, uri: str, data: dict, **kwargs) -> Dict:
         """
@@ -163,13 +163,13 @@ class BaiduTieBaClient(AbstractApiClient):
 
     async def pong(self, browser_context: BrowserContext = None) -> bool:
         """
-        用于检查登录态是否失效了
+        用于check登录态是否失效了
         使用Cookie检测而非API调用,避免被检测
         Args:
             browser_context: 浏览器上下文对象
 
         Returns:
-            bool: True表示已登录,False表示未登录
+            bool: Truetable示已登录,Falsetable示未登录
         """
         utils.logger.info("[BaiduTieBaClient.pong] Begin to check tieba login state by cookies...")
 
@@ -178,10 +178,10 @@ class BaiduTieBaClient(AbstractApiClient):
             return False
 
         try:
-            # 从浏览器获取cookies并检查关键登录cookie
+            # 从浏览器getcookies并check关键登录cookie
             _, cookie_dict = utils.convert_cookies(await browser_context.cookies())
 
-            # 百度贴吧的登录标识: STOKEN 或 PTOKEN
+            # 百度Tieba的登录标识: STOKEN 或 PTOKEN
             stoken = cookie_dict.get("STOKEN")
             ptoken = cookie_dict.get("PTOKEN")
             bduss = cookie_dict.get("BDUSS")  # 百度通用登录cookie
@@ -199,7 +199,7 @@ class BaiduTieBaClient(AbstractApiClient):
 
     async def update_cookies(self, browser_context: BrowserContext):
         """
-        API客户端提供的更新cookies方法，一般情况下登录成功后会调用此方法
+        API客户端提供的updatecookies方法，一般情况下登录success后会调用此方法
         Args:
             browser_context: 浏览器上下文对象
 
@@ -219,9 +219,9 @@ class BaiduTieBaClient(AbstractApiClient):
         note_type: SearchNoteType = SearchNoteType.FIXED_THREAD,
     ) -> List[TiebaNote]:
         """
-        根据关键词搜索贴吧帖子 (使用Playwright访问页面,避免API检测)
+        根据keyword搜索Tieba帖子 (使用Playwright访问页面,避免API检测)
         Args:
-            keyword: 关键词
+            keyword: keyword
             page: 分页第几页
             page_size: 每页大小
             sort: 结果排序方式
@@ -253,25 +253,25 @@ class BaiduTieBaClient(AbstractApiClient):
             # 使用Playwright访问搜索页面
             await self.playwright_page.goto(full_url, wait_until="domcontentloaded")
 
-            # 等待页面加载,使用配置文件中的延时设置
+            # 等待页面加载,使用configuration文件中的延时设置
             await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
 
-            # 获取页面HTML内容
+            # get页面HTMLcontent
             page_content = await self.playwright_page.content()
-            utils.logger.info(f"[BaiduTieBaClient.get_notes_by_keyword] 成功获取搜索页面HTML,长度: {len(page_content)}")
+            utils.logger.info(f"[BaiduTieBaClient.get_notes_by_keyword] successget搜索页面HTML,长度: {len(page_content)}")
 
-            # 提取搜索结果
+            # extract搜索结果
             notes = self._page_extractor.extract_search_note_list(page_content)
-            utils.logger.info(f"[BaiduTieBaClient.get_notes_by_keyword] 提取到 {len(notes)} 条帖子")
+            utils.logger.info(f"[BaiduTieBaClient.get_notes_by_keyword] extract到 {len(notes)} 帖子")
             return notes
 
         except Exception as e:
-            utils.logger.error(f"[BaiduTieBaClient.get_notes_by_keyword] 搜索失败: {e}")
+            utils.logger.error(f"[BaiduTieBaClient.get_notes_by_keyword] 搜索failed: {e}")
             raise
 
     async def get_note_by_id(self, note_id: str) -> TiebaNote:
         """
-        根据帖子ID获取帖子详情 (使用Playwright访问页面,避免API检测)
+        根据帖子IDget帖子详情 (使用Playwright访问页面,避免API检测)
         Args:
             note_id: 帖子ID
 
@@ -290,19 +290,19 @@ class BaiduTieBaClient(AbstractApiClient):
             # 使用Playwright访问帖子详情页面
             await self.playwright_page.goto(note_url, wait_until="domcontentloaded")
 
-            # 等待页面加载,使用配置文件中的延时设置
+            # 等待页面加载,使用configuration文件中的延时设置
             await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
 
-            # 获取页面HTML内容
+            # get页面HTMLcontent
             page_content = await self.playwright_page.content()
-            utils.logger.info(f"[BaiduTieBaClient.get_note_by_id] 成功获取帖子详情HTML,长度: {len(page_content)}")
+            utils.logger.info(f"[BaiduTieBaClient.get_note_by_id] successget帖子详情HTML,长度: {len(page_content)}")
 
-            # 提取帖子详情
+            # extract帖子详情
             note_detail = self._page_extractor.extract_note_detail(page_content)
             return note_detail
 
         except Exception as e:
-            utils.logger.error(f"[BaiduTieBaClient.get_note_by_id] 获取帖子详情失败: {e}")
+            utils.logger.error(f"[BaiduTieBaClient.get_note_by_id] get帖子详情failed: {e}")
             raise
 
     async def get_note_all_comments(
@@ -313,14 +313,14 @@ class BaiduTieBaClient(AbstractApiClient):
         max_count: int = 10,
     ) -> List[TiebaComment]:
         """
-        获取指定帖子下的所有一级评论 (使用Playwright访问页面,避免API检测)
+        get指定帖子下的all一级comment (使用Playwright访问页面,避免API检测)
         Args:
             note_detail: 帖子详情对象
-            crawl_interval: 爬取一次笔记的延迟单位（秒）
-            callback: 一次笔记爬取结束后的回调函数
-            max_count: 一次帖子爬取的最大评论数量
+            crawl_interval: crawl一次笔记的延迟单位（秒）
+            callback: 一次笔记crawl结束后的回调函数
+            max_count: 一次帖子crawl的maximumcomment数量
         Returns:
-            List[TiebaComment]: 评论列表
+            List[TiebaComment]: comment列table
         """
         if not self.playwright_page:
             utils.logger.error("[BaiduTieBaClient.get_note_all_comments] playwright_page is None, cannot use browser mode")
@@ -330,30 +330,30 @@ class BaiduTieBaClient(AbstractApiClient):
         current_page = 1
 
         while note_detail.total_replay_page >= current_page and len(result) < max_count:
-            # 构造评论页URL
+            # 构造comment页URL
             comment_url = f"{self._host}/p/{note_detail.note_id}?pn={current_page}"
-            utils.logger.info(f"[BaiduTieBaClient.get_note_all_comments] 访问评论页面: {comment_url}")
+            utils.logger.info(f"[BaiduTieBaClient.get_note_all_comments] 访问comment页面: {comment_url}")
 
             try:
-                # 使用Playwright访问评论页面
+                # 使用Playwright访问comment页面
                 await self.playwright_page.goto(comment_url, wait_until="domcontentloaded")
 
-                # 等待页面加载,使用配置文件中的延时设置
+                # 等待页面加载,使用configuration文件中的延时设置
                 await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
 
-                # 获取页面HTML内容
+                # get页面HTMLcontent
                 page_content = await self.playwright_page.content()
 
-                # 提取评论
+                # extractcomment
                 comments = self._page_extractor.extract_tieba_note_parment_comments(
                     page_content, note_id=note_detail.note_id
                 )
 
                 if not comments:
-                    utils.logger.info(f"[BaiduTieBaClient.get_note_all_comments] 第{current_page}页没有评论,停止爬取")
+                    utils.logger.info(f"[BaiduTieBaClient.get_note_all_comments] 第{current_page}页没有comment,停止crawl")
                     break
 
-                # 限制评论数量
+                # 限制comment数量
                 if len(result) + len(comments) > max_count:
                     comments = comments[:max_count - len(result)]
 
@@ -362,7 +362,7 @@ class BaiduTieBaClient(AbstractApiClient):
 
                 result.extend(comments)
 
-                # 获取所有子评论
+                # getall子comment
                 await self.get_comments_all_sub_comments(
                     comments, crawl_interval=crawl_interval, callback=callback
                 )
@@ -371,10 +371,10 @@ class BaiduTieBaClient(AbstractApiClient):
                 current_page += 1
 
             except Exception as e:
-                utils.logger.error(f"[BaiduTieBaClient.get_note_all_comments] 获取第{current_page}页评论失败: {e}")
+                utils.logger.error(f"[BaiduTieBaClient.get_note_all_comments] get第{current_page}页commentfailed: {e}")
                 break
 
-        utils.logger.info(f"[BaiduTieBaClient.get_note_all_comments] 共获取 {len(result)} 条一级评论")
+        utils.logger.info(f"[BaiduTieBaClient.get_note_all_comments] 共get {len(result)} 一级comment")
         return result
 
     async def get_comments_all_sub_comments(
@@ -384,14 +384,14 @@ class BaiduTieBaClient(AbstractApiClient):
         callback: Optional[Callable] = None,
     ) -> List[TiebaComment]:
         """
-        获取指定评论下的所有子评论 (使用Playwright访问页面,避免API检测)
+        get指定comment下的all子comment (使用Playwright访问页面,避免API检测)
         Args:
-            comments: 评论列表
-            crawl_interval: 爬取一次笔记的延迟单位（秒）
-            callback: 一次笔记爬取结束后的回调函数
+            comments: comment列table
+            crawl_interval: crawl一次笔记的延迟单位（秒）
+            callback: 一次笔记crawl结束后的回调函数
 
         Returns:
-            List[TiebaComment]: 子评论列表
+            List[TiebaComment]: 子comment列table
         """
         if not config.ENABLE_GET_SUB_COMMENTS:
             return []
@@ -410,7 +410,7 @@ class BaiduTieBaClient(AbstractApiClient):
             max_sub_page_num = parment_comment.sub_comment_count // 10 + 1
 
             while max_sub_page_num >= current_page:
-                # 构造子评论URL
+                # 构造子commentURL
                 sub_comment_url = (
                     f"{self._host}/p/comment?"
                     f"tid={parment_comment.note_id}&"
@@ -418,19 +418,19 @@ class BaiduTieBaClient(AbstractApiClient):
                     f"fid={parment_comment.tieba_id}&"
                     f"pn={current_page}"
                 )
-                utils.logger.info(f"[BaiduTieBaClient.get_comments_all_sub_comments] 访问子评论页面: {sub_comment_url}")
+                utils.logger.info(f"[BaiduTieBaClient.get_comments_all_sub_comments] 访问子comment页面: {sub_comment_url}")
 
                 try:
-                    # 使用Playwright访问子评论页面
+                    # 使用Playwright访问子comment页面
                     await self.playwright_page.goto(sub_comment_url, wait_until="domcontentloaded")
 
-                    # 等待页面加载,使用配置文件中的延时设置
+                    # 等待页面加载,使用configuration文件中的延时设置
                     await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
 
-                    # 获取页面HTML内容
+                    # get页面HTMLcontent
                     page_content = await self.playwright_page.content()
 
-                    # 提取子评论
+                    # extract子comment
                     sub_comments = self._page_extractor.extract_tieba_note_sub_comments(
                         page_content, parent_comment=parment_comment
                     )
@@ -438,7 +438,7 @@ class BaiduTieBaClient(AbstractApiClient):
                     if not sub_comments:
                         utils.logger.info(
                             f"[BaiduTieBaClient.get_comments_all_sub_comments] "
-                            f"评论{parment_comment.comment_id}第{current_page}页没有子评论,停止爬取"
+                            f"comment{parment_comment.comment_id}第{current_page}页没有子comment,停止crawl"
                         )
                         break
 
@@ -452,59 +452,59 @@ class BaiduTieBaClient(AbstractApiClient):
                 except Exception as e:
                     utils.logger.error(
                         f"[BaiduTieBaClient.get_comments_all_sub_comments] "
-                        f"获取评论{parment_comment.comment_id}第{current_page}页子评论失败: {e}"
+                        f"getcomment{parment_comment.comment_id}第{current_page}页子commentfailed: {e}"
                     )
                     break
 
-        utils.logger.info(f"[BaiduTieBaClient.get_comments_all_sub_comments] 共获取 {len(all_sub_comments)} 条子评论")
+        utils.logger.info(f"[BaiduTieBaClient.get_comments_all_sub_comments] 共get {len(all_sub_comments)} 子comment")
         return all_sub_comments
 
     async def get_notes_by_tieba_name(self, tieba_name: str, page_num: int) -> List[TiebaNote]:
         """
-        根据贴吧名称获取帖子列表 (使用Playwright访问页面,避免API检测)
+        根据Tieba名称get帖子列table (使用Playwright访问页面,避免API检测)
         Args:
-            tieba_name: 贴吧名称
+            tieba_name: Tieba名称
             page_num: 分页页码
 
         Returns:
-            List[TiebaNote]: 帖子列表
+            List[TiebaNote]: 帖子列table
         """
         if not self.playwright_page:
             utils.logger.error("[BaiduTieBaClient.get_notes_by_tieba_name] playwright_page is None, cannot use browser mode")
             raise Exception("playwright_page is required for browser-based tieba note fetching")
 
-        # 构造贴吧帖子列表URL
+        # 构造Tieba帖子列tableURL
         tieba_url = f"{self._host}/f?kw={quote(tieba_name)}&pn={page_num}"
-        utils.logger.info(f"[BaiduTieBaClient.get_notes_by_tieba_name] 访问贴吧页面: {tieba_url}")
+        utils.logger.info(f"[BaiduTieBaClient.get_notes_by_tieba_name] 访问Tieba页面: {tieba_url}")
 
         try:
-            # 使用Playwright访问贴吧页面
+            # 使用Playwright访问Tieba页面
             await self.playwright_page.goto(tieba_url, wait_until="domcontentloaded")
 
-            # 等待页面加载,使用配置文件中的延时设置
+            # 等待页面加载,使用configuration文件中的延时设置
             await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
 
-            # 获取页面HTML内容
+            # get页面HTMLcontent
             page_content = await self.playwright_page.content()
-            utils.logger.info(f"[BaiduTieBaClient.get_notes_by_tieba_name] 成功获取贴吧页面HTML,长度: {len(page_content)}")
+            utils.logger.info(f"[BaiduTieBaClient.get_notes_by_tieba_name] successgetTieba页面HTML,长度: {len(page_content)}")
 
-            # 提取帖子列表
+            # extract帖子列table
             notes = self._page_extractor.extract_tieba_note_list(page_content)
-            utils.logger.info(f"[BaiduTieBaClient.get_notes_by_tieba_name] 提取到 {len(notes)} 条帖子")
+            utils.logger.info(f"[BaiduTieBaClient.get_notes_by_tieba_name] extract到 {len(notes)} 帖子")
             return notes
 
         except Exception as e:
-            utils.logger.error(f"[BaiduTieBaClient.get_notes_by_tieba_name] 获取贴吧帖子列表失败: {e}")
+            utils.logger.error(f"[BaiduTieBaClient.get_notes_by_tieba_name] getTieba帖子列tablefailed: {e}")
             raise
 
     async def get_creator_info_by_url(self, creator_url: str) -> str:
         """
-        根据创作者URL获取创作者信息 (使用Playwright访问页面,避免API检测)
+        根据创作者URLget创作者信息 (使用Playwright访问页面,避免API检测)
         Args:
             creator_url: 创作者主页URL
 
         Returns:
-            str: 页面HTML内容
+            str: 页面HTMLcontent
         """
         if not self.playwright_page:
             utils.logger.error("[BaiduTieBaClient.get_creator_info_by_url] playwright_page is None, cannot use browser mode")
@@ -516,61 +516,61 @@ class BaiduTieBaClient(AbstractApiClient):
             # 使用Playwright访问创作者主页
             await self.playwright_page.goto(creator_url, wait_until="domcontentloaded")
 
-            # 等待页面加载,使用配置文件中的延时设置
+            # 等待页面加载,使用configuration文件中的延时设置
             await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
 
-            # 获取页面HTML内容
+            # get页面HTMLcontent
             page_content = await self.playwright_page.content()
-            utils.logger.info(f"[BaiduTieBaClient.get_creator_info_by_url] 成功获取创作者主页HTML,长度: {len(page_content)}")
+            utils.logger.info(f"[BaiduTieBaClient.get_creator_info_by_url] successget创作者主页HTML,长度: {len(page_content)}")
 
             return page_content
 
         except Exception as e:
-            utils.logger.error(f"[BaiduTieBaClient.get_creator_info_by_url] 获取创作者主页失败: {e}")
+            utils.logger.error(f"[BaiduTieBaClient.get_creator_info_by_url] get创作者主页failed: {e}")
             raise
 
     async def get_notes_by_creator(self, user_name: str, page_number: int) -> Dict:
         """
-        根据创作者获取创作者的帖子 (使用Playwright访问页面,避免API检测)
+        根据创作者get创作者的帖子 (使用Playwright访问页面,避免API检测)
         Args:
-            user_name: 创作者用户名
+            user_name: 创作者user名
             page_number: 页码
 
         Returns:
-            Dict: 包含帖子数据的字典
+            Dict: 包含帖子data的字典
         """
         if not self.playwright_page:
             utils.logger.error("[BaiduTieBaClient.get_notes_by_creator] playwright_page is None, cannot use browser mode")
             raise Exception("playwright_page is required for browser-based creator notes fetching")
 
-        # 构造创作者帖子列表URL
+        # 构造创作者帖子列tableURL
         creator_url = f"{self._host}/home/get/getthread?un={quote(user_name)}&pn={page_number}&id=utf-8&_={utils.get_current_timestamp()}"
-        utils.logger.info(f"[BaiduTieBaClient.get_notes_by_creator] 访问创作者帖子列表: {creator_url}")
+        utils.logger.info(f"[BaiduTieBaClient.get_notes_by_creator] 访问创作者帖子列table: {creator_url}")
 
         try:
-            # 使用Playwright访问创作者帖子列表页面
+            # 使用Playwright访问创作者帖子列table页面
             await self.playwright_page.goto(creator_url, wait_until="domcontentloaded")
 
-            # 等待页面加载,使用配置文件中的延时设置
+            # 等待页面加载,使用configuration文件中的延时设置
             await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
 
-            # 获取页面内容(这个接口返回JSON)
+            # get页面content(这个接口返回JSON)
             page_content = await self.playwright_page.content()
 
-            # 提取JSON数据(页面会包含<pre>标签或直接是JSON)
+            # extractJSONdata(页面会包含<pre>标签或直接是JSON)
             try:
-                # 尝试从页面中提取JSON
+                # 尝试从页面中extractJSON
                 json_text = await self.playwright_page.evaluate("() => document.body.innerText")
                 result = json.loads(json_text)
-                utils.logger.info(f"[BaiduTieBaClient.get_notes_by_creator] 成功获取创作者帖子数据")
+                utils.logger.info(f"[BaiduTieBaClient.get_notes_by_creator] successget创作者帖子data")
                 return result
             except json.JSONDecodeError as e:
-                utils.logger.error(f"[BaiduTieBaClient.get_notes_by_creator] JSON解析失败: {e}")
-                utils.logger.error(f"[BaiduTieBaClient.get_notes_by_creator] 页面内容: {page_content[:500]}")
+                utils.logger.error(f"[BaiduTieBaClient.get_notes_by_creator] JSON解析failed: {e}")
+                utils.logger.error(f"[BaiduTieBaClient.get_notes_by_creator] 页面content: {page_content[:500]}")
                 raise Exception(f"Failed to parse JSON from creator notes page: {e}")
 
         except Exception as e:
-            utils.logger.error(f"[BaiduTieBaClient.get_notes_by_creator] 获取创作者帖子列表失败: {e}")
+            utils.logger.error(f"[BaiduTieBaClient.get_notes_by_creator] get创作者帖子列tablefailed: {e}")
             raise
 
     async def get_all_notes_by_creator_user_name(
@@ -582,18 +582,18 @@ class BaiduTieBaClient(AbstractApiClient):
         creator_page_html_content: str = None,
     ) -> List[TiebaNote]:
         """
-        根据创作者用户名获取创作者所有帖子
+        根据创作者user名get创作者all帖子
         Args:
-            user_name: 创作者用户名
-            crawl_interval: 爬取一次笔记的延迟单位（秒）
-            callback: 一次笔记爬取结束后的回调函数，是一个awaitable类型的函数
-            max_note_count: 帖子最大获取数量，如果为0则获取所有
-            creator_page_html_content: 创作者主页HTML内容
+            user_name: 创作者user名
+            crawl_interval: crawl一次笔记的延迟单位（秒）
+            callback: 一次笔记crawl结束后的回调函数，是一个awaitable类型的函数
+            max_note_count: 帖子maximumget数量，如果为0则getall
+            creator_page_html_content: 创作者主页HTMLcontent
 
         Returns:
 
         """
-        # 百度贴吧比较特殊一些，前10个帖子是直接展示在主页上的，要单独处理，通过API获取不到
+        # 百度Tieba比较特殊一些，前10个帖子是直接展示在主页上的，要单独处理，通过APIget不到
         result: List[TiebaNote] = []
         if creator_page_html_content:
             thread_id_list = (self._page_extractor.extract_tieba_thread_id_list_from_creator_page(creator_page_html_content))

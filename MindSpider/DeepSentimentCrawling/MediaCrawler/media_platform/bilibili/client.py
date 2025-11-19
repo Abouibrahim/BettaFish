@@ -1,12 +1,12 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：
 # 1. 不得用于任何商业用途。
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。
-# 3. 不得进行大规模爬取或对平台造成运营干扰。
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。
+# 3. 不得进行大规模crawl或对platform造成运营干扰。
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。
 # 5. 不得用于任何非法或不当的用途。
 #
 # 详细许可条款请参阅项目根目录下的LICENSE文件。
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。
 
 # -*- coding: utf-8 -*-
 # @Author  : relakkes@gmail.com
@@ -34,7 +34,7 @@ class BilibiliClient(AbstractApiClient):
 
     def __init__(
         self,
-        timeout=60,  # 若开启爬取媒体选项，b 站的长视频需要更久的超时时间
+        timeout=60,  # 若开启crawl媒体选项，b 站的长视频need更久的超时时间
         proxy=None,
         *,
         headers: Dict[str, str],
@@ -64,7 +64,7 @@ class BilibiliClient(AbstractApiClient):
     async def pre_request_data(self, req_data: Dict) -> Dict:
         """
         发送请求进行请求参数签名
-        需要从 localStorage 拿 wbi_img_urls 这参数，值如下：
+        need从 localStorage 拿 wbi_img_urls 这参数，值如下：
         https://i0.hdslb.com/bfs/wbi/7cd084941338484aae1ad9425b84077c.png-https://i0.hdslb.com/bfs/wbi/4932caff0ff746eab6f01bf08b70ac45.png
         :param req_data:
         :return:
@@ -76,7 +76,7 @@ class BilibiliClient(AbstractApiClient):
 
     async def get_wbi_keys(self) -> Tuple[str, str]:
         """
-        获取最新的 img_key 和 sub_key
+        get最新的 img_key 和 sub_key
         :return:
         """
         local_storage = await self.playwright_page.evaluate("() => window.localStorage")
@@ -141,10 +141,10 @@ class BilibiliClient(AbstractApiClient):
     ) -> Dict:
         """
         KuaiShou web search api
-        :param keyword: 搜索关键词
+        :param keyword: 搜索keyword
         :param page: 分页参数具体第几页
         :param page_size: 每一页参数的数量
-        :param order: 搜索结果排序，默认位综合排序
+        :param order: 搜索结果排序，default位综合排序
         :param pubtime_begin_s: 发布时间开始时间戳
         :param pubtime_end_s: 发布时间结束时间戳
         :return:
@@ -214,7 +214,7 @@ class BilibiliClient(AbstractApiClient):
                 )
                 return None
             except httpx.HTTPError as exc:  # some wrong when call httpx.request method, such as connection error, client error, server error or response status code is not 2xx
-                utils.logger.error(f"[BilibiliClient.get_video_media] {exc.__class__.__name__} for {exc.request.url} - {exc}")  # 保留原始异常类型名称，以便开发者调试
+                utils.logger.error(f"[BilibiliClient.get_video_media] {exc.__class__.__name__} for {exc.request.url} - {exc}")  # 保留原始exception类型名称，以便开发者调试
                 return None
 
     async def get_video_comments(
@@ -226,7 +226,7 @@ class BilibiliClient(AbstractApiClient):
         """get video comments
         :param video_id: 视频 ID
         :param order_mode: 排序方式
-        :param next: 评论页选择
+        :param next: comment页选择
         :return:
         """
         uri = "/x/v2/reply/wbi/main"
@@ -247,7 +247,7 @@ class BilibiliClient(AbstractApiClient):
         :param crawl_interval:
         :param is_fetch_sub_comments:
         :param callback:
-        max_count: 一次笔记爬取的最大评论数量
+        max_count: 一次笔记crawl的maximumcomment数量
 
         :return:
         """
@@ -280,7 +280,7 @@ class BilibiliClient(AbstractApiClient):
 
             comment_list: List[Dict] = comments_res.get("replies", [])
 
-            # 检查 is_end 和 next 是否存在
+            # check is_end 和 next 是否存在
             if "is_end" not in cursor_info or "next" not in cursor_info:
                 utils.logger.warning(f"[BilibiliClient.get_video_all_comments] 'is_end' or 'next' not in cursor for video_id: {video_id}. Assuming end of comments.")
                 is_end = True
@@ -298,7 +298,7 @@ class BilibiliClient(AbstractApiClient):
                         {await self.get_video_all_level_two_comments(video_id, comment_id, CommentOrderType.DEFAULT, 10, crawl_interval, callback)}
             if len(result) + len(comment_list) > max_count:
                 comment_list = comment_list[:max_count - len(result)]
-            if callback:  # 如果有回调函数，就执行回调函数
+            if callback:  # 如果有回调函数，就execute回调函数
                 await callback(video_id, comment_list)
             await asyncio.sleep(crawl_interval)
             if not is_fetch_sub_comments:
@@ -318,9 +318,9 @@ class BilibiliClient(AbstractApiClient):
         """
         get video all level two comments for a level one comment
         :param video_id: 视频 ID
-        :param level_one_comment_id: 一级评论 ID
+        :param level_one_comment_id: 一级comment ID
         :param order_mode:
-        :param ps: 一页评论数
+        :param ps: 一页comment数
         :param crawl_interval:
         :param callback:
         :return:
@@ -330,7 +330,7 @@ class BilibiliClient(AbstractApiClient):
         while True:
             result = await self.get_video_level_two_comments(video_id, level_one_comment_id, pn, ps, order_mode)
             comment_list: List[Dict] = result.get("replies", [])
-            if callback:  # 如果有回调函数，就执行回调函数
+            if callback:  # 如果有回调函数，就execute回调函数
                 await callback(video_id, comment_list)
             await asyncio.sleep(crawl_interval)
             if (int(result["page"]["count"]) <= pn * ps):
@@ -348,7 +348,7 @@ class BilibiliClient(AbstractApiClient):
     ) -> Dict:
         """get video level two comments
         :param video_id: 视频 ID
-        :param level_one_comment_id: 一级评论 ID
+        :param level_one_comment_id: 一级comment ID
         :param order_mode: 排序方式
 
         :return:
@@ -466,9 +466,9 @@ class BilibiliClient(AbstractApiClient):
         :param creator_info:
         :param crawl_interval:
         :param callback:
-        :param max_count: 一个up主爬取的最大粉丝数量
+        :param max_count: 一个up主crawl的maximum粉丝数量
 
-        :return: up主粉丝数列表
+        :return: up主粉丝数列table
         """
         creator_id = creator_info["id"]
         result = []
@@ -480,7 +480,7 @@ class BilibiliClient(AbstractApiClient):
             pn += 1
             if len(result) + len(fans_list) > max_count:
                 fans_list = fans_list[:max_count - len(result)]
-            if callback:  # 如果有回调函数，就执行回调函数
+            if callback:  # 如果有回调函数，就execute回调函数
                 await callback(creator_info, fans_list)
             await asyncio.sleep(crawl_interval)
             if not fans_list:
@@ -500,9 +500,9 @@ class BilibiliClient(AbstractApiClient):
         :param creator_info:
         :param crawl_interval:
         :param callback:
-        :param max_count: 一个up主爬取的最大关注者数量
+        :param max_count: 一个up主crawl的maximum关注者数量
 
-        :return: up主关注者列表
+        :return: up主关注者列table
         """
         creator_id = creator_info["id"]
         result = []
@@ -514,7 +514,7 @@ class BilibiliClient(AbstractApiClient):
             pn += 1
             if len(result) + len(followings_list) > max_count:
                 followings_list = followings_list[:max_count - len(result)]
-            if callback:  # 如果有回调函数，就执行回调函数
+            if callback:  # 如果有回调函数，就execute回调函数
                 await callback(creator_info, followings_list)
             await asyncio.sleep(crawl_interval)
             if not followings_list:
@@ -534,9 +534,9 @@ class BilibiliClient(AbstractApiClient):
         :param creator_info:
         :param crawl_interval:
         :param callback:
-        :param max_count: 一个up主爬取的最大动态数量
+        :param max_count: 一个up主crawl的maximum动态数量
 
-        :return: up主关注者列表
+        :return: up主关注者列table
         """
         creator_id = creator_info["id"]
         result = []

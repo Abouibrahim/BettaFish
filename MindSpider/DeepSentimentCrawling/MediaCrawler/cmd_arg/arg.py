@@ -1,12 +1,12 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：
 # 1. 不得用于任何商业用途。
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。
-# 3. 不得进行大规模爬取或对平台造成运营干扰。
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。
+# 3. 不得进行大规模crawl或对platform造成运营干扰。
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。
 # 5. 不得用于任何非法或不当的用途。
 #
 # 详细许可条款请参阅项目根目录下的LICENSE文件。
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。
 
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ EnumT = TypeVar("EnumT", bound=Enum)
 
 
 class PlatformEnum(str, Enum):
-    """支持的媒体平台枚举"""
+    """支持的媒体platform枚举"""
 
     XHS = "xhs"
     DOUYIN = "dy"
@@ -56,7 +56,7 @@ class CrawlerTypeEnum(str, Enum):
 
 
 class SaveDataOptionEnum(str, Enum):
-    """数据保存方式枚举"""
+    """datasave方式枚举"""
 
     CSV = "csv"
     DB = "db"
@@ -66,7 +66,7 @@ class SaveDataOptionEnum(str, Enum):
 
 
 class InitDbOptionEnum(str, Enum):
-    """数据库初始化选项"""
+    """databaseinitialize选项"""
 
     SQLITE = "sqlite"
     MYSQL = "mysql"
@@ -93,7 +93,7 @@ def _coerce_enum(
         return enum_cls(value)
     except ValueError:
         typer.secho(
-            f"⚠️ 配置值 '{value}' 不在 {enum_cls.__name__} 支持的范围内，已回退到默认值 '{default.value}'.",
+            f"⚠️ configuration值 '{value}' 不在 {enum_cls.__name__} 支持的范围内，已回退到default值 '{default.value}'.",
             fg=typer.colors.YELLOW,
         )
         return default
@@ -134,8 +134,8 @@ async def parse_cmd(argv: Optional[Sequence[str]] = None):
             PlatformEnum,
             typer.Option(
                 "--platform",
-                help="媒体平台选择 (xhs=小红书 | dy=抖音 | ks=快手 | bili=哔哩哔哩 | wb=微博 | tieba=百度贴吧 | zhihu=知乎)",
-                rich_help_panel="基础配置",
+                help="媒体platform选择 (xhs=Xiaohongshu | dy=Douyin | ks=Kuaishou | bili=Bilibili | wb=Weibo | tieba=百度Tieba | zhihu=Zhihu)",
+                rich_help_panel="基础configuration",
             ),
         ] = _coerce_enum(PlatformEnum, config.PLATFORM, PlatformEnum.XHS),
         lt: Annotated[
@@ -143,15 +143,15 @@ async def parse_cmd(argv: Optional[Sequence[str]] = None):
             typer.Option(
                 "--lt",
                 help="登录方式 (qrcode=二维码 | phone=手机号 | cookie=Cookie)",
-                rich_help_panel="账号配置",
+                rich_help_panel="账号configuration",
             ),
         ] = _coerce_enum(LoginTypeEnum, config.LOGIN_TYPE, LoginTypeEnum.QRCODE),
         crawler_type: Annotated[
             CrawlerTypeEnum,
             typer.Option(
                 "--type",
-                help="爬取类型 (search=搜索 | detail=详情 | creator=创作者)",
-                rich_help_panel="基础配置",
+                help="crawl类型 (search=搜索 | detail=详情 | creator=创作者)",
+                rich_help_panel="基础configuration",
             ),
         ] = _coerce_enum(CrawlerTypeEnum, config.CRAWLER_TYPE, CrawlerTypeEnum.SEARCH),
         start: Annotated[
@@ -159,23 +159,23 @@ async def parse_cmd(argv: Optional[Sequence[str]] = None):
             typer.Option(
                 "--start",
                 help="起始页码",
-                rich_help_panel="基础配置",
+                rich_help_panel="基础configuration",
             ),
         ] = config.START_PAGE,
         keywords: Annotated[
             str,
             typer.Option(
                 "--keywords",
-                help="请输入关键词，多个关键词用逗号分隔",
-                rich_help_panel="基础配置",
+                help="请输入keyword，多个keyword用逗号分隔",
+                rich_help_panel="基础configuration",
             ),
         ] = config.KEYWORDS,
         get_comment: Annotated[
             str,
             typer.Option(
                 "--get_comment",
-                help="是否爬取一级评论，支持 yes/true/t/y/1 或 no/false/f/n/0",
-                rich_help_panel="评论配置",
+                help="是否crawl一级comment，支持 yes/true/t/y/1 或 no/false/f/n/0",
+                rich_help_panel="commentconfiguration",
                 show_default=True,
             ),
         ] = str(config.ENABLE_GET_COMMENTS),
@@ -183,8 +183,8 @@ async def parse_cmd(argv: Optional[Sequence[str]] = None):
             str,
             typer.Option(
                 "--get_sub_comment",
-                help="是否爬取二级评论，支持 yes/true/t/y/1 或 no/false/f/n/0",
-                rich_help_panel="评论配置",
+                help="是否crawl二级comment，支持 yes/true/t/y/1 或 no/false/f/n/0",
+                rich_help_panel="commentconfiguration",
                 show_default=True,
             ),
         ] = str(config.ENABLE_GET_SUB_COMMENTS),
@@ -192,8 +192,8 @@ async def parse_cmd(argv: Optional[Sequence[str]] = None):
             SaveDataOptionEnum,
             typer.Option(
                 "--save_data_option",
-                help="数据保存方式 (csv=CSV文件 | db=MySQL数据库 | json=JSON文件 | sqlite=SQLite数据库 | postgresql=PostgreSQL数据库)",
-                rich_help_panel="存储配置",
+                help="datasave方式 (csv=CSV文件 | db=MySQLdatabase | json=JSON文件 | sqlite=SQLitedatabase | postgresql=PostgreSQLdatabase)",
+                rich_help_panel="存储configuration",
             ),
         ] = _coerce_enum(
             SaveDataOptionEnum, config.SAVE_DATA_OPTION, SaveDataOptionEnum.JSON
@@ -202,8 +202,8 @@ async def parse_cmd(argv: Optional[Sequence[str]] = None):
             Optional[InitDbOptionEnum],
             typer.Option(
                 "--init_db",
-                help="初始化数据库表结构 (sqlite | mysql | postgresql)",
-                rich_help_panel="存储配置",
+                help="initializedatabasetable结构 (sqlite | mysql | postgresql)",
+                rich_help_panel="存储configuration",
             ),
         ] = None,
         cookies: Annotated[
@@ -211,7 +211,7 @@ async def parse_cmd(argv: Optional[Sequence[str]] = None):
             typer.Option(
                 "--cookies",
                 help="Cookie 登录方式使用的 Cookie 值",
-                rich_help_panel="账号配置",
+                rich_help_panel="账号configuration",
             ),
         ] = config.COOKIES,
     ) -> SimpleNamespace:

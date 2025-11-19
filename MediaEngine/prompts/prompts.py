@@ -171,7 +171,7 @@ Your tasks are:
 3. Explain your selection reasoning
 
 Note: All tools do not require additional parameters; tool selection is mainly based on search intent and needed information type.
-Please format your output according to the following JSON schema definition (text should be in Chinese):
+Please format your output according to the following JSON schema definition:
 
 <OUTPUT JSON SCHEMA>
 {json.dumps(output_schema_first_search, indent=2, ensure_ascii=False)}

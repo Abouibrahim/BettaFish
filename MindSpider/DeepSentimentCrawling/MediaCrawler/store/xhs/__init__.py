@@ -1,12 +1,12 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：
 # 1. 不得用于任何商业用途。
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。
-# 3. 不得进行大规模爬取或对平台造成运营干扰。
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。
+# 3. 不得进行大规模crawl或对platform造成运营干扰。
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。
 # 5. 不得用于任何非法或不当的用途。
 #
 # 详细许可条款请参阅项目根目录下的LICENSE文件。
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。
 
 # -*- coding: utf-8 -*-
 # @Author  : relakkes@gmail.com
@@ -40,7 +40,7 @@ class XhsStoreFactory:
 
 def get_video_url_arr(note_item: Dict) -> List:
     """
-    获取视频url数组
+    get视频url数组
     Args:
         note_item:
 
@@ -67,7 +67,7 @@ def get_video_url_arr(note_item: Dict) -> List:
 
 async def update_xhs_note(note_item: Dict):
     """
-    更新小红书笔记
+    updateXiaohongshu笔记
     Args:
         note_item:
 
@@ -93,20 +93,20 @@ async def update_xhs_note(note_item: Dict):
         "desc": note_item.get("desc", ""),  # 帖子描述
         "video_url": video_url,  # 帖子视频url
         "time": note_item.get("time"),  # 帖子发布时间
-        "last_update_time": note_item.get("last_update_time", 0),  # 帖子最后更新时间
-        "user_id": user_info.get("user_id"),  # 用户id
-        "nickname": user_info.get("nickname"),  # 用户昵称
-        "avatar": user_info.get("avatar"),  # 用户头像
+        "last_update_time": note_item.get("last_update_time", 0),  # 帖子最后update时间
+        "user_id": user_info.get("user_id"),  # userid
+        "nickname": user_info.get("nickname"),  # user昵称
+        "avatar": user_info.get("avatar"),  # user头像
         "liked_count": interact_info.get("liked_count"),  # 点赞数
         "collected_count": interact_info.get("collected_count"),  # 收藏数
-        "comment_count": interact_info.get("comment_count"),  # 评论数
+        "comment_count": interact_info.get("comment_count"),  # comment数
         "share_count": interact_info.get("share_count"),  # 分享数
         "ip_location": note_item.get("ip_location", ""),  # ip地址
         "image_list": ','.join([img.get('url', '') for img in image_list]),  # 图片url
         "tag_list": ','.join([tag.get('name', '') for tag in tag_list if tag.get('type') == 'topic']),  # 标签
-        "last_modify_ts": utils.get_current_timestamp(),  # 最后更新时间戳（MediaCrawler程序生成的，主要用途在db存储的时候记录一条记录最新更新时间）
+        "last_modify_ts": utils.get_current_timestamp(),  # 最后update时间戳（MediaCrawler程序生成的，主要用途在db存储的时候record一条record最新update时间）
         "note_url": f"https://www.xiaohongshu.com/explore/{note_id}?xsec_token={note_item.get('xsec_token')}&xsec_source=pc_search",  # 帖子url
-        "source_keyword": source_keyword_var.get(),  # 搜索关键词
+        "source_keyword": source_keyword_var.get(),  # 搜索keyword
         "xsec_token": note_item.get("xsec_token"),  # xsec_token
     }
     utils.logger.info(f"[store.xhs.update_xhs_note] xhs note: {local_db_item}")
@@ -115,7 +115,7 @@ async def update_xhs_note(note_item: Dict):
 
 async def batch_update_xhs_note_comments(note_id: str, comments: List[Dict]):
     """
-    批量更新小红书笔记评论
+    批量updateXiaohongshu笔记comment
     Args:
         note_id:
         comments:
@@ -131,7 +131,7 @@ async def batch_update_xhs_note_comments(note_id: str, comments: List[Dict]):
 
 async def update_xhs_note_comment(note_id: str, comment_item: Dict):
     """
-    更新小红书笔记评论
+    updateXiaohongshu笔记comment
     Args:
         note_id:
         comment_item:
@@ -144,18 +144,18 @@ async def update_xhs_note_comment(note_id: str, comment_item: Dict):
     comment_pictures = [item.get("url_default", "") for item in comment_item.get("pictures", [])]
     target_comment = comment_item.get("target_comment", {})
     local_db_item = {
-        "comment_id": comment_id,  # 评论id
-        "create_time": comment_item.get("create_time"),  # 评论时间
+        "comment_id": comment_id,  # commentid
+        "create_time": comment_item.get("create_time"),  # comment时间
         "ip_location": comment_item.get("ip_location"),  # ip地址
         "note_id": note_id,  # 帖子id
-        "content": comment_item.get("content"),  # 评论内容
-        "user_id": user_info.get("user_id"),  # 用户id
-        "nickname": user_info.get("nickname"),  # 用户昵称
-        "avatar": user_info.get("image"),  # 用户头像
-        "sub_comment_count": comment_item.get("sub_comment_count", 0),  # 子评论数
-        "pictures": ",".join(comment_pictures),  # 评论图片
-        "parent_comment_id": target_comment.get("id", 0),  # 父评论id
-        "last_modify_ts": utils.get_current_timestamp(),  # 最后更新时间戳（MediaCrawler程序生成的，主要用途在db存储的时候记录一条记录最新更新时间）
+        "content": comment_item.get("content"),  # commentcontent
+        "user_id": user_info.get("user_id"),  # userid
+        "nickname": user_info.get("nickname"),  # user昵称
+        "avatar": user_info.get("image"),  # user头像
+        "sub_comment_count": comment_item.get("sub_comment_count", 0),  # 子comment数
+        "pictures": ",".join(comment_pictures),  # comment图片
+        "parent_comment_id": target_comment.get("id", 0),  # 父commentid
+        "last_modify_ts": utils.get_current_timestamp(),  # 最后update时间戳（MediaCrawler程序生成的，主要用途在db存储的时候record一条record最新update时间）
         "like_count": comment_item.get("like_count", 0),
     }
     utils.logger.info(f"[store.xhs.update_xhs_note_comment] xhs note comment:{local_db_item}")
@@ -164,7 +164,7 @@ async def update_xhs_note_comment(note_id: str, comment_item: Dict):
 
 async def save_creator(user_id: str, creator: Dict):
     """
-    保存小红书创作者
+    saveXiaohongshu创作者
     Args:
         user_id:
         creator:
@@ -194,18 +194,18 @@ async def save_creator(user_id: str, creator: Dict):
             return None
 
     local_db_item = {
-        'user_id': user_id,  # 用户id
+        'user_id': user_id,  # userid
         'nickname': user_info.get('nickname'),  # 昵称
         'gender': get_gender(user_info.get('gender')),  # 性别
         'avatar': user_info.get('images'),  # 头像
-        'desc': user_info.get('desc'),  # 个人描述
+        'desc': user_info.get('desc'),  # 人描述
         'ip_location': user_info.get('ipLocation'),  # ip地址
         'follows': follows,  # 关注数
         'fans': fans,  # 粉丝数
         'interaction': interaction,  # 互动数
         'tag_list': json.dumps({tag.get('tagType'): tag.get('name')
                                 for tag in creator.get('tags')}, ensure_ascii=False),  # 标签
-        "last_modify_ts": utils.get_current_timestamp(),  # 最后更新时间戳（MediaCrawler程序生成的，主要用途在db存储的时候记录一条记录最新更新时间）
+        "last_modify_ts": utils.get_current_timestamp(),  # 最后update时间戳（MediaCrawler程序生成的，主要用途在db存储的时候record一条record最新update时间）
     }
     utils.logger.info(f"[store.xhs.save_creator] creator:{local_db_item}")
     await XhsStoreFactory.create_store().store_creator(local_db_item)
@@ -213,7 +213,7 @@ async def save_creator(user_id: str, creator: Dict):
 
 async def update_xhs_note_image(note_id, pic_content, extension_file_name):
     """
-    更新小红书笔记图片
+    updateXiaohongshu笔记图片
     Args:
         note_id:
         pic_content:
@@ -228,7 +228,7 @@ async def update_xhs_note_image(note_id, pic_content, extension_file_name):
 
 async def update_xhs_note_video(note_id, video_content, extension_file_name):
     """
-    更新小红书笔记视频
+    updateXiaohongshu笔记视频
     Args:
         note_id:
         video_content:

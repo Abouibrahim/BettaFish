@@ -1,12 +1,12 @@
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：
 # 1. 不得用于任何商业用途。
-# 2. 使用时应遵守目标平台的使用条款和robots.txt规则。
-# 3. 不得进行大规模爬取或对平台造成运营干扰。
-# 4. 应合理控制请求频率，避免给目标平台带来不必要的负担。
+# 2. 使用时应遵守目标platform的使用条款和robots.txt规则。
+# 3. 不得进行大规模crawl或对platform造成运营干扰。
+# 4. 应合理控制请求频率，避免给目标platform带来不必要的负担。
 # 5. 不得用于任何非法或不当的用途。
 #
 # 详细许可条款请参阅项目根目录下的LICENSE文件。
-# 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。
+# 使用本代码即table示您同意遵守上述原则和LICENSE中的all条款。
 
 
 import os
@@ -24,7 +24,7 @@ from tools import utils
 
 class BrowserLauncher:
     """
-    浏览器启动器，用于检测和启动用户的Chrome/Edge浏览器
+    浏览器启动器，用于检测和启动user的Chrome/Edge浏览器
     支持Windows和macOS系统
     """
     
@@ -36,7 +36,7 @@ class BrowserLauncher:
     def detect_browser_paths(self) -> List[str]:
         """
         检测系统中可用的浏览器路径
-        返回按优先级排序的浏览器路径列表
+        返回按优先级排序的浏览器路径列table
         """
         paths = []
         
@@ -85,7 +85,7 @@ class BrowserLauncher:
                 "/usr/bin/microsoft-edge-dev",
             ]
         
-        # 检查路径是否存在且可执行
+        # check路径是否存在且可execute
         for path in possible_paths:
             if os.path.isfile(path) and os.access(path, os.X_OK):
                 paths.append(path)
@@ -105,7 +105,7 @@ class BrowserLauncher:
             except OSError:
                 port += 1
         
-        raise RuntimeError(f"无法找到可用的端口，已尝试 {start_port} 到 {port-1}")
+        raise RuntimeError(f"unable to找到可用的端口，已尝试 {start_port} 到 {port-1}")
     
     def launch_browser(self, browser_path: str, debug_port: int, headless: bool = False,
                       user_data_dir: Optional[str] = None) -> subprocess.Popen:
@@ -144,10 +144,10 @@ class BrowserLauncher:
         else:
             # 非无头模式的额外参数
             args.extend([
-                "--start-maximized",  # 最大化窗口,更像真实用户
+                "--start-maximized",  # maximum化窗口,更像真实user
             ])
         
-        # 用户数据目录
+        # userdata目录
         if user_data_dir:
             args.append(f"--user-data-dir={user_data_dir}")
         
@@ -176,7 +176,7 @@ class BrowserLauncher:
             return process
             
         except Exception as e:
-            utils.logger.error(f"[BrowserLauncher] 启动浏览器失败: {e}")
+            utils.logger.error(f"[BrowserLauncher] 启动浏览器failed: {e}")
             raise
     
     def wait_for_browser_ready(self, debug_port: int, timeout: int = 30) -> bool:
@@ -204,7 +204,7 @@ class BrowserLauncher:
     
     def get_browser_info(self, browser_path: str) -> Tuple[str, str]:
         """
-        获取浏览器信息（名称和版本）
+        get浏览器信息（名称和版本）
         """
         try:
             if "chrome" in browser_path.lower():
@@ -216,7 +216,7 @@ class BrowserLauncher:
             else:
                 name = "Unknown Browser"
             
-            # 尝试获取版本信息
+            # 尝试get版本信息
             try:
                 result = subprocess.run([browser_path, "--version"], 
                                       capture_output=True, text=True, timeout=5)
@@ -231,7 +231,7 @@ class BrowserLauncher:
     
     def cleanup(self):
         """
-        清理资源，关闭浏览器进程
+        cleanup资源，关闭浏览器进程
         """
         if not self.browser_process:
             return
@@ -239,7 +239,7 @@ class BrowserLauncher:
         process = self.browser_process
 
         if process.poll() is not None:
-            utils.logger.info("[BrowserLauncher] 浏览器进程已退出，无需清理")
+            utils.logger.info("[BrowserLauncher] 浏览器进程已退出，无需cleanup")
             self.browser_process = None
             return
 
@@ -247,12 +247,12 @@ class BrowserLauncher:
 
         try:
             if self.system == "Windows":
-                # 先尝试正常终止
+                # 先尝试normal终止
                 process.terminate()
                 try:
                     process.wait(timeout=5)
                 except subprocess.TimeoutExpired:
-                    utils.logger.warning("[BrowserLauncher] 正常终止超时，使用taskkill强制结束")
+                    utils.logger.warning("[BrowserLauncher] normal终止超时，使用taskkill强制结束")
                     subprocess.run(
                         ["taskkill", "/F", "/T", "/PID", str(process.pid)],
                         capture_output=True,
@@ -264,7 +264,7 @@ class BrowserLauncher:
                 try:
                     os.killpg(pgid, signal.SIGTERM)
                 except ProcessLookupError:
-                    utils.logger.info("[BrowserLauncher] 浏览器进程组不存在，可能已退出")
+                    utils.logger.info("[BrowserLauncher] 浏览器进程组does not exist，可能已退出")
                 else:
                     try:
                         process.wait(timeout=5)
